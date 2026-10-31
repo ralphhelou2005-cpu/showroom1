@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Milcar | Supercars with the whole story</title>
+<meta name="description" content="Milcar Automotive Consultancy. Walk into the showroom, see the whole car and its whole past, and book a private viewing.">
+<meta name="theme-color" content="#0B0D14">
+<!-- DEPLOY STEP: patch og:image and og:url with the live absolute URL -->
+<meta property="og:title" content="Milcar | Supercars with the whole story">
+<meta property="og:description" content="Every car has a story. We show you all of it.">
+<meta property="og:image" content="assets/hero-poster.jpg">
+<meta property="og:url" content="">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111218'/%3E%3Cpath d='M6 24 11 8h4l2 9 6-9h4l-5 16h-4l3-9-6 9h-2l-2-9-3 9z' fill='%23EFEDF4'/%3E%3Cpath d='M4 28h24' stroke='%23E3262E' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Marcellus&family=Mrs+Saint+Delafield&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="env" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav" id="nav" aria-label="Main">
+  <a class="wordmark" href="#top">Milcar<small>Automotive Consultancy</small></a>
+  <ul>
+    <li><a href="#promise">The promise</a></li>
+    <li><a href="#build">The build</a></li>
+    <li><a href="#questions">Questions</a></li>
+    <li><a href="inventory.html">Inventory</a></li>
+    <li><a class="btn" href="#book">Book a viewing</a></li>
+  </ul>
+</nav>
+
+<main id="main" tabindex="-1">
+  <div id="top" class="hero">
+    <div class="stage" id="stage">
+      <div class="poster" id="poster" aria-hidden="true"></div>
+      <video id="hero" preload="none" muted playsinline aria-hidden="true" tabindex="-1"></video>
+      <div class="scrim" aria-hidden="true"></div>
+      <div class="band b1" data-a="0" data-b=".24"><p data-split>Milcar. Come inside.</p></div>
+      <div class="band b2" data-a=".26" data-b=".48"><p>Every car has a story.</p></div>
+      <div class="band b3" data-a=".5" data-b=".7"><p><span class="soft" aria-hidden="true">We show you all of it.</span><span class="sharp">We show you all of it.</span></p></div>
+      <div class="band b4" data-a=".72" data-b="1"><p data-split>Book a private viewing.</p><a class="btn" href="#book">Book now</a></div>      <div class="cue label" id="cue" aria-hidden="true">Scroll to walk in</div>
+      <svg class="loader" id="ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="126" style="stroke-dashoffset:var(--ld,126)"/></svg>
+    </div>
+    <div class="static-hero">
+      <div class="static-photo" role="img" aria-label="The Milcar showroom at night, its cars lit behind the glass"></div>
+      <div class="static-copy">
+        <h1>Every car has a story. We show you all of it.</h1>
+        <p>Milcar Automotive Consultancy. Supercars and luxury cars, with the full history on the table.</p>
+        <a class="btn" href="#book">Book a private viewing</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="below" id="below">
+    <svg class="streak" id="streak" aria-hidden="true"><path id="streakPath"/></svg>
+
+    <section class="promise reveal" id="promise">
+      <figure class="rv"><img src="assets/promise.jpg" alt="The leather interior of a supercar"></figure>
+      <div>
+        <p class="label rv" style="--i:1">The promise</p>
+        <h2 class="rv" style="--i:2">Ask to see everything.</h2>
+        <ul class="docs">
+          <li class="rv" style="--i:3">The VIN <span class="label">01</span></li>
+          <li class="rv" style="--i:4">The service records <span class="label">02</span></li>
+          <li class="rv" style="--i:5">The import papers <span class="label">03</span></li>
+          <li class="rv" style="--i:6">The mileage history <span class="label">04</span></li>
+        </ul>
+        <p class="ask rv" style="--i:7">Ask for them before you ask the price.</p>
+      </div>
+    </section>
+
+    <section class="build" id="build" aria-labelledby="buildTitle">
+      <div class="build-head reveal">
+        <h2 id="buildTitle" class="rv">See what's under the paint.</h2>
+        <p class="label rv" style="--i:1">Hold the button. Let go and it eases back.</p>
+      </div>
+      <div class="bay" id="bay">
+        <img class="still on" data-at="0" src="assets/stage-1.jpg" alt="A bare carbon frame on workshop stands" loading="lazy">
+        <img class="still" data-at=".25" src="assets/stage-2.jpg" alt="" loading="lazy">
+        <img class="still" data-at=".5" src="assets/stage-3.jpg" alt="" loading="lazy">
+        <img class="still" data-at=".75" src="assets/stage-4.jpg" alt="" loading="lazy">
+        <img class="still" data-at="1" src="assets/stage-5.jpg" alt="" loading="lazy">
+        <video id="buildVid" preload="none" muted playsinline aria-hidden="true" tabindex="-1"></video>
+        <img class="paint" data-color="red" src="assets/color-red.jpg" alt="" loading="lazy">
+        <img class="paint" data-color="blue" src="assets/color-blue.jpg" alt="" loading="lazy">
+        <img class="paint" data-color="silver" src="assets/color-silver.jpg" alt="" loading="lazy">
+        <img class="paint" data-color="black" src="assets/color-black.jpg" alt="" loading="lazy">
+        <ol class="parts" id="parts" aria-hidden="true">
+          <li class="on"><i></i>Carbon frame</li>
+          <li><i></i>Engine</li>
+          <li><i></i>Wheels and brakes</li>
+          <li><i></i>Bodywork</li>
+          <li><i></i>Paint</li>
+        </ol>
+        <p class="concept label">Illustration only.<br>Not for sale.</p>
+      </div>
+      <div class="controls" id="controls">
+        <button class="hold" id="hold" type="button" aria-label="Hold to build" aria-describedby="holdState"><svg viewBox="0 0 104 104" aria-hidden="true"><circle class="track" cx="52" cy="52" r="48"/><circle class="prog" cx="52" cy="52" r="48" pathLength="1"/></svg><span>Hold</span></button>
+        <div class="hold-text"><span class="hold-copy">Hold to build</span><span class="label" id="holdState" role="status">Stage 1 of 5: Carbon frame</span></div>
+        <div class="picker">
+          <h3>Now pick your color.</h3>
+          <div class="swatches" role="group" aria-label="Paint color">
+            <button class="swatch" type="button" data-pick="red" aria-pressed="true" style="--c:#C4161C"><span></span>Race Red</button>
+            <button class="swatch" type="button" data-pick="blue" aria-pressed="false" style="--c:#123F63"><span></span>Deep Blue</button>
+            <button class="swatch" type="button" data-pick="silver" aria-pressed="false" style="--c:#B9BAC0"><span></span>Silver</button>
+            <button class="swatch" type="button" data-pick="black" aria-pressed="false" style="--c:#101014"><span></span>Black</button>
+          </div>
+          <button class="again" id="again" type="button">Build it again</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="teaser reveal" id="inventory">
+      <div>
+        <p class="label rv">The inventory</p>
+        <h2 class="rv" style="--i:1">Every car, with its story.</h2>
+        <p class="rv" style="--i:2">See what's in the showroom, then ask for the history of the one you want.</p>
+        <a class="btn rv" style="--i:3" href="inventory.html">View the inventory</a>
+      </div>
+      <div class="teaser-cars rv" style="--i:2">
+        <a href="car.html?id=f8-tributo" aria-label="Ferrari F8 Tributo specs"><img src="assets/cars/f8.jpg" alt="Red Ferrari F8 Tributo" loading="lazy"></a>
+        <a href="car.html?id=huracan-evo" aria-label="Lamborghini Huracán EVO specs"><img src="assets/cars/huracan.jpg" alt="Orange Lamborghini Huracán EVO" loading="lazy"></a>
+        <a href="car.html?id=g63" aria-label="Mercedes-AMG G 63 specs"><img src="assets/cars/g63.jpg" alt="Black Mercedes-AMG G 63" loading="lazy"></a>
+      </div>
+    </section>
+
+    <section class="how reveal" id="how">
+      <h2 class="rv">Three steps. No guessing.</h2>
+      <ol class="steps">
+        <li class="step rv" style="--i:1"><img src="assets/step-1.jpg" alt="A black SUV in a dark tunnel with its lights on" loading="lazy"><span class="label">Step 1</span><h3>Tell us what you want.</h3><p>The car, the color, the budget. Or just the feeling.</p></li>
+        <li class="step rv" style="--i:2"><img src="assets/step-2.jpg" alt="A red leather sports car interior" loading="lazy"><span class="label">Step 2</span><h3>See the car and its papers.</h3><p>Together, side by side, before anyone talks about price.</p></li>
+        <li class="step rv" style="--i:3"><img src="assets/step-3.jpg" alt="An exposed chassis and engine" loading="lazy"><span class="label">Step 3</span><h3>Bring your own mechanic.</h3><p>Have the car checked by someone you trust.</p></li>
+      </ol>
+    </section>
+
+    <section class="faq" id="questions">
+      <div class="reveal"><h2 class="rv">Real questions.</h2></div>
+      <div>
+        <details><summary>How do I know it was never crashed?</summary><p>Ask for the history and check the car with your own mechanic. We want you to.</p></details>
+        <details><summary>Can you find a car you don't have?</summary><p>Tell us the car you want. We'll tell you straight if we can find it.</p></details>
+        <details><summary>Can I see it in private?</summary><p>Yes. Book a time and the showroom is yours.</p></details>
+      </div>
+    </section>
+
+    <section class="book" id="book">
+      <div class="book-img"><img src="assets/hero-poster.jpg" alt="The Milcar showroom glowing at night" loading="lazy"></div>
+      <div class="book-form" id="bookForm">
+        <h2>Book a private viewing.</h2>
+        <p>Tell us how to reach you and which car you want to see.</p>
+        <form id="form">
+          <label><span class="label">Name</span><input name="name" required autocomplete="name" placeholder="Your name"></label>
+          <label><span class="label">Phone</span><input name="phone" type="tel" required autocomplete="tel" placeholder="Your phone number"></label>
+          <label><span class="label">Car of interest</span><input name="car" placeholder="The car you have in mind"></label>
+          <button class="btn" type="submit" id="bookEnd">Request my viewing</button>
+        </form>
+        <div class="done-msg" role="status"><h3>Thanks, this is a preview.</h3><p>This form isn't connected yet, so your details weren't sent anywhere.</p></div>
+      </div>
+    </section>
+
+    <footer>
+      <div><a class="wordmark" href="#top">Milcar</a><p class="signature">Minas Missirian</p><p>Automotive Consultancy</p></div>
+      <div><b>Visit</b><span class="todo">Address and opening hours go here.</span></div>
+      <div><b>Call</b><span class="todo">Phone and WhatsApp go here.</span></div>
+    </footer>
+  </div>
+</main>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const clamp=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
+const smoothstep=(p,a,b)=>{const t=clamp((p-a)/(b-a),0,1);return t*t*(3-2*t)};
+function rng(seed){let s=seed>>>0;return()=>(s=(s*1664525+1013904223)>>>0)/4294967296}
+
+/* ---------- split words, keep the sentence for screen readers ---------- */
+$$('[data-split]').forEach((el,n)=>{
+  const text=el.textContent, r=rng(11+n), words=text.split(' ');
+  el.setAttribute('aria-label',text);
+  el.textContent='';
+  words.forEach((w,i)=>{
+    const s=document.createElement('span');
+    s.className='w'; s.setAttribute('aria-hidden','true');
+    s.textContent=w+(i<words.length-1?' ':'');
+    s.style.setProperty('--th',(i/words.length*.5+r()*.05).toFixed(3));
+    el.appendChild(s);
+  });
+});
+
+/* ---------- the hero scrub ---------- */
+const SMALL=matchMedia('(max-width: 820px), (pointer: coarse)').matches;
+const VIDEO_URL=SMALL?'assets/hero-scrub-m.mp4':'assets/hero-scrub.mp4', VIDEO_BYTES=SMALL?3309576:6928383;
+const stage=$('#stage'), hero=$('.hero'), video=$('#hero'), ring=$('#ring'), posterLayer=$('#poster'), cue=$('#cue');
+const bands=$$('.band').map((el,i,all)=>({el,a:+el.dataset.a,b:+el.dataset.b,first:i===0,last:i===all.length-1,op:-1,k:-1}));
+let target=0,shown=0,rafId=null,lastTick=0,heroOnScreen=true,loadK=0,scrubOn=false,heroInit=false;
+let seekBusy=false,pendingTime=null,lastOx=-1,lastRise=-1;
+const nav=$('#nav'), panel=$('#below');
+
+/* the walk-in ends exactly when the website panel reaches the bottom of the screen */
+function heroRange(){return panel.offsetTop-hero.offsetTop-innerHeight}
+function heroProgress(){
+  const range=heroRange();
+  return range>0?clamp(-hero.getBoundingClientRect().top/range,0,1):0;
+}
+/* while the panel rises, the held frame stays bright with a slow push in; the panel's content is already there when it arrives */
+function updateRise(){
+  if(!scrubOn)return;
+  const rise=Math.round(clamp((scrollY-heroRange())/innerHeight,0,1)*200)/200;
+  if(rise===lastRise)return;
+  lastRise=rise;
+  const e=rise*(2-rise);
+  const s='translateZ(0) scale('+(1+e*.045).toFixed(4)+')';
+  video.style.transform=s; posterLayer.style.transform=s;
+}
+function requestSeek(t){
+  if(!video.duration)return;
+  if(seekBusy){pendingTime=t;return}
+  seekBusy=true; video.currentTime=Math.min(t,video.duration-.06);   /* some browsers paint black when seeked to the exact end */
+}
+video.addEventListener('seeked',()=>{
+  seekBusy=false;
+  if(pendingTime!==null){const t=pendingTime;pendingTime=null;requestSeek(t)}
+});
+video.addEventListener('error',()=>{seekBusy=false;pendingTime=null;failVideo()});
+
+function updateCaptions(p){
+  bands.forEach(b=>{
+    const f=Math.min(.02,(b.b-b.a)/3);
+    let op=(b.first?1:smoothstep(p,b.a,b.a+f))*(b.last?1:1-smoothstep(p,b.b-f,b.b));
+    let k=clamp((p-b.a)/Math.min(.025,(b.b-b.a)*.35),0,1);
+    if(b.first)k=Math.max(k,loadK);
+    if(p<b.a&&!b.first)op=0;
+    if(Math.abs(op-b.op)>.004||((op===0||op===1)&&op!==b.op)){b.op=op;b.el.style.opacity=op.toFixed(3);b.el.style.visibility=op<.01?'hidden':'visible'}
+    if(Math.abs(k-b.k)>.008){b.k=k;b.el.style.setProperty('--k',k.toFixed(3))}
+    if(b.last)b.el.classList.toggle('live',op>.9&&k>.9);
+  });
+  cue.classList.toggle('gone',p>.012);
+  /* the real sign is the logo while it is in view, so the nav mark waits; keep the sign in frame on narrower screens */
+  nav.classList.toggle('on-sign',p<.3);
+  /* on a tall screen, pan from the sign to the red car's bay, then hold it centered */
+  const tall=innerHeight>innerWidth;
+  const raw=tall?(p<.22?5+54*smoothstep(p,.02,.22):59-12*smoothstep(p,.5,.92)):30+20*clamp(p/.25,0,1);
+  const ox=Math.round(raw*2)/2;
+  if(ox!==lastOx){lastOx=ox;video.style.objectPosition=posterLayer.style.backgroundPosition=ox+'% 50%'}
+}
+function tick(now){
+  const dt=Math.min(100,now-(lastTick||now)); lastTick=now;
+  shown+=(target-shown)*(1-Math.pow(1-.22,dt/16.667));
+  if(Math.abs(target-shown)<.0005){shown=target;rafId=null;lastTick=0}
+  else rafId=requestAnimationFrame(tick);
+  requestSeek(shown*(video.duration||0));
+  updateCaptions(shown);
+}
+function onScroll(){
+  target=heroProgress();
+  if(rafId===null&&heroOnScreen&&scrubOn)rafId=requestAnimationFrame(tick);
+}
+new IntersectionObserver(e=>{heroOnScreen=e[0].isIntersecting;if(heroOnScreen)onScroll()}).observe(stage);
+
+function initHeroOnce(){
+  if(heroInit)return; heroInit=true;
+  posterLayer.style.backgroundImage="url('assets/hero-poster.jpg')";
+  let started=false;
+  const start=()=>{if(started)return;started=true;loadHeroBlob().catch(failVideo)};
+  const im=new Image(); im.onload=start; im.onerror=start; im.src='assets/hero-poster.jpg';
+  setTimeout(start,4000);
+  const t0=performance.now();
+  (function ramp(now){
+    loadK=clamp((now-t0)/900,0,1); updateCaptions(shown);
+    if(loadK<1&&scrubOn)requestAnimationFrame(ramp); else{loadK=1;updateCaptions(shown)}
+  })(t0);
+}
+async function loadHeroBlob(){
+  const ctrl=new AbortController();
+  let watchdog=setTimeout(()=>ctrl.abort(),20000);
+  const res=await fetch(VIDEO_URL,{priority:'low',signal:ctrl.signal});
+  if(!res.ok)throw new Error('video '+res.status);
+  const total=Number(res.headers.get('Content-Length'))||VIDEO_BYTES;
+  const reader=res.body.getReader(), chunks=[]; let got=0,last=0;
+  for(;;){
+    const {done,value}=await reader.read();
+    if(done)break;
+    clearTimeout(watchdog); watchdog=setTimeout(()=>ctrl.abort(),20000);
+    chunks.push(value); got+=value.length;
+    const frac=Math.min(1,got/total), now=performance.now();
+    if(now-last>100||frac===1){last=now;ring.style.setProperty('--ld',Math.round(126*(1-frac)))}
+  }
+  clearTimeout(watchdog); ring.style.setProperty('--ld',0);
+  video.src=URL.createObjectURL(new Blob(chunks,{type:'video/mp4'}));
+  video.load();
+  video.addEventListener('canplay',()=>{
+    shown=target=heroProgress(); requestSeek(shown*video.duration);
+    stage.classList.add('video-ready'); updateCaptions(shown);
+    /* phone browsers only paint seeks once a muted video has started, so start and stop it */
+    const started=video.play();
+    if(started)started.then(()=>{video.pause();requestSeek(heroProgress()*video.duration)}).catch(()=>{});
+  },{once:true});
+}
+function failVideo(){
+  ring.style.display='none'; video.style.display='none';
+  stage.classList.add('video-failed'); updateCaptions(heroProgress());
+}
+
+const GATES=[
+  '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',
+  '(prefers-reduced-motion: reduce)'
+];
+function enableScrub(){
+  if(scrubOn)return; scrubOn=true;
+  initHeroOnce();
+  addEventListener('scroll',onScroll,{passive:true});
+  bands.forEach(b=>{b.op=-1;b.k=-1});
+  shown=target=heroProgress(); updateCaptions(shown); onScroll();
+}
+function disableScrub(){
+  if(!scrubOn)return; scrubOn=false;
+  nav.classList.remove('on-sign');
+  removeEventListener('scroll',onScroll);
+  if(rafId!==null){cancelAnimationFrame(rafId);rafId=null}
+}
+function applyHeroMode(){
+  if(GATES.some(q=>matchMedia(q).matches))disableScrub(); else enableScrub();
+  layoutStreak();
+}
+const MQLS=GATES.map(q=>matchMedia(q));
+MQLS.forEach(m=>m.addEventListener('change',applyHeroMode));
+
+/* ---------- nav ---------- */
+let navSolid=null;
+function updateNav(){
+  const s=scrollY>panel.offsetTop-70;
+  if(s!==navSolid){navSolid=s;nav.classList.toggle('solid',s)}
+}
+
+/* ---------- the tail-light streak, one line down the whole page ---------- */
+const below=$('#below'), streak=$('#streak'), sPath=$('#streakPath'), bookEnd=$('#bookEnd');
+let sLen=0,lastDash=-1;
+function layoutStreak(){
+  const W=below.clientWidth, top=below.getBoundingClientRect().top+scrollY;
+  streak.setAttribute('viewBox',`0 0 ${W} ${below.clientHeight}`);
+  streak.setAttribute('width',W); streak.setAttribute('height',below.clientHeight);
+  /* run down the page gutters and only sweep across in the gaps between sections, so it never strikes through words */
+  const edge=Math.min(10,W*.012), panel=$('#bookForm').getBoundingClientRect();
+  const stops=['#inventory','#how','#questions'].map(s=>$(s).getBoundingClientRect().top+scrollY-top);
+  const endY=panel.top+scrollY-top, endX=panel.left+panel.width/2;
+  let side=W-edge, d=`M${W*.08} 1 C ${W*.5} 1 ${side} 10 ${side} 54`;
+  stops.forEach(y=>{
+    const to=side<W/2?W-edge:edge;
+    d+=` L ${side} ${y-14} C ${side} ${y+14} ${to} ${y+2} ${to} ${y+30}`;
+    side=to;
+  });
+  d+=` L ${side} ${endY-40} C ${side} ${endY-8} ${endX} ${endY-34} ${endX} ${endY}`;
+  sPath.setAttribute('d',d);
+  sLen=sPath.getTotalLength();
+  sPath.style.strokeDasharray=sLen; lastDash=-1; drawStreak();
+}
+function drawStreak(){
+  if(!sLen)return;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){if(lastDash!==0){lastDash=0;sPath.style.strokeDashoffset=0}return}
+  const top=below.getBoundingClientRect().top, h=streak.getBoundingClientRect().height;
+  const end=$('#book').getBoundingClientRect().bottom-top;
+  const p=clamp((innerHeight*.72-top)/Math.min(h,end),0,1);
+  const dash=Math.round(sLen*(1-p));
+  if(dash!==lastDash){lastDash=dash;sPath.style.strokeDashoffset=dash}
+}
+let queued=false;
+addEventListener('scroll',()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;updateNav();updateRise();drawStreak()})},{passive:true});
+addEventListener('resize',()=>{layoutStreak();updateNav();onScroll()},{passive:true});
+
+/* ---------- reveals ---------- */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return;
+  e.target.classList.add('in'); io.unobserve(e.target);
+  setTimeout(()=>e.target.classList.add('done'),1800);
+}),{threshold:.14,rootMargin:'0px 0px -6% 0px'});
+$$('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- the one interactive moment: hold to build ---------- */
+const bay=$('#bay'), bvid=$('#buildVid'), hold=$('#hold'), holdState=$('#holdState'), controls=$('#controls');
+const stills=$$('.still',bay), paints=$$('.paint',bay), partEls=$$('#parts li'), swatches=$$('.swatch');
+const STAGES=['Carbon frame','Engine','Wheels and brakes','Bodywork','Paint'];
+const HOLD_SECONDS=11, BACK_SECONDS=5;
+let bp=0,holding=false,bRaf=null,bLast=0,built=false,lastStage=-1,bBusy=false,bPending=null,lastFill=-1;
+
+function bSeek(t){
+  if(!bvid.duration)return;
+  if(bBusy){bPending=t;return}
+  bBusy=true; bvid.currentTime=t;
+}
+bvid.addEventListener('seeked',()=>{bBusy=false;if(bPending!==null){const t=bPending;bPending=null;bSeek(t)}});
+bvid.addEventListener('error',()=>{bBusy=false;bPending=null;bay.classList.remove('video-ready')});
+
+let buildLoaded=false;
+async function loadBuild(){
+  if(buildLoaded)return; buildLoaded=true;
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  try{
+    const res=await fetch('assets/build-scrub.mp4',{priority:'low'});
+    if(!res.ok)throw 0;
+    bvid.src=URL.createObjectURL(await res.blob());
+    bvid.load();
+    bvid.addEventListener('canplay',()=>{bSeek(bp*bvid.duration);bay.classList.add('video-ready')},{once:true});
+  }catch(e){/* stills carry the build */}
+}
+new IntersectionObserver((e,o)=>{if(e[0].isIntersecting){loadBuild();o.disconnect()}},{rootMargin:'120% 0px'}).observe(bay);
+
+function renderBuild(){
+  const s=Math.min(4,Math.floor(bp*5));
+  if(s!==lastStage){
+    lastStage=s;
+    partEls.forEach((el,i)=>el.classList.toggle('on',i<=s));
+    holdState.textContent=`Stage ${s+1} of 5: ${STAGES[s]}`;
+  }
+  let best=0; stills.forEach((el,i)=>{if(bp+.001>=+el.dataset.at)best=i});
+  stills.forEach((el,i)=>el.classList.toggle('on',i===best));
+  const fill=Math.round(bp*200)/200;
+  if(fill!==lastFill){lastFill=fill;hold.style.setProperty('--p',fill)}
+  bSeek(bp*(bvid.duration||0));
+}
+function buildLoop(now){
+  const dt=Math.min(100,now-(bLast||now))/1000; bLast=now;
+  bp=clamp(bp+(holding?dt/HOLD_SECONDS:-dt/BACK_SECONDS),0,1);
+  renderBuild();
+  if(bp>=1){finish();bRaf=null;bLast=0;return}
+  if(holding||bp>0)bRaf=requestAnimationFrame(buildLoop);
+  else{bRaf=null;bLast=0}
+}
+function kick(){if(bRaf===null&&!built)bRaf=requestAnimationFrame(buildLoop)}
+function finish(){
+  built=true; holding=false;
+  controls.classList.add('built'); bay.classList.add('built');
+  setColor('red');
+  holdState.textContent='Finished. Pick a color.';
+}
+function setColor(c){
+  paints.forEach(p=>p.classList.toggle('on',p.dataset.color===c));
+  swatches.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.pick===c)));
+}
+function pressOn(e){if(built)return;if(e.cancelable&&e.type!=='keydown')e.preventDefault();holding=true;loadBuild();kick()}
+function pressOff(){holding=false;kick()}
+hold.addEventListener('pointerdown',e=>{hold.setPointerCapture&&hold.setPointerCapture(e.pointerId);pressOn(e)});
+hold.addEventListener('pointerup',pressOff);
+hold.addEventListener('pointercancel',pressOff);
+hold.addEventListener('lostpointercapture',pressOff);
+hold.addEventListener('contextmenu',e=>e.preventDefault());
+hold.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Enter')&&!e.repeat){e.preventDefault();pressOn(e)}});
+hold.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();pressOff()}});
+hold.addEventListener('blur',pressOff);
+swatches.forEach(b=>b.addEventListener('click',()=>setColor(b.dataset.pick)));
+$('#again').addEventListener('click',()=>{
+  built=false; bp=0; lastStage=-1; lastFill=-1;
+  controls.classList.remove('built'); bay.classList.remove('built');
+  paints.forEach(p=>p.classList.remove('on'));
+  renderBuild(); hold.focus();
+});
+
+/* ---------- reduced motion, live in both directions ---------- */
+function pinToFinalStates(){
+  $$('.reveal').forEach(el=>el.classList.add('in','done'));
+  holding=false; if(bRaf!==null){cancelAnimationFrame(bRaf);bRaf=null}
+  bp=1; lastStage=-1; renderBuild(); finish();
+  lastDash=-1; drawStreak();
+}
+function unpinFinalStates(){
+  built=false; bp=0; lastStage=-1; lastFill=-1;
+  controls.classList.remove('built'); bay.classList.remove('built');
+  paints.forEach(p=>p.classList.remove('on'));
+  renderBuild(); lastDash=-1; drawStreak(); loadBuild();
+}
+const rm=matchMedia('(prefers-reduced-motion: reduce)');
+rm.addEventListener('change',e=>{
+  if(e.matches)pinToFinalStates();
+  else{unpinFinalStates();applyHeroMode()}
+});
+
+/* ---------- pause on hidden tabs ---------- */
+document.addEventListener('visibilitychange',()=>document.body.classList.toggle('paused',document.hidden));
+
+/* ---------- the form: not connected until the owner chooses where it sends ---------- */
+const wanted=new URLSearchParams(location.search).get('car');
+if(wanted)$('#form').elements.car.value=wanted;
+$('#form').addEventListener('submit',e=>{
+  e.preventDefault();
+  $('#bookForm').classList.add('sent');
+  layoutStreak();
+});
+
+/* ---------- start ---------- */
+applyHeroMode();
+updateNav();
+if(rm.matches)pinToFinalStates();
+addEventListener('load',layoutStreak);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(layoutStreak);
+})();
+</script>
+</body>
+</html>

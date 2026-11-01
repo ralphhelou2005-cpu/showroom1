@@ -15,7 +15,7 @@
 <link rel="preload" href="assets/fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="assets/hero-poster.webp" imagesrcset="assets/hero-poster-1100.webp 1100w, assets/hero-poster.webp 1728w" imagesizes="(orientation:portrait) 420px, 100vw" fetchpriority="high">
-<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/site.css?v=20261101b">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -66,7 +66,7 @@
       </div>
       <div class="front-scroll" tabindex="-1">
         <div class="front" data-front data-after-hero>
-          <img class="front-plate" src="assets/dealership.webp" srcset="assets/dealership-1200.webp 1200w, assets/dealership-1800.webp 1800w, assets/dealership.webp 2600w" sizes="(max-width:900px) 1240px, 100vw" width="2600" height="1103" alt="The Milcar showroom at night, with one car behind each of its six glass windows" decoding="async" loading="lazy">
+          <img class="front-plate" src="assets/dealership.webp" srcset="assets/dealership-1200.webp 1200w, assets/dealership-1800.webp 1800w, assets/dealership.webp 2600w" sizes="(max-width:900px) 590px, 100vw" width="2600" height="1103" alt="The Milcar showroom at night, with one car behind each of its six glass windows" decoding="async" loading="lazy">
         </div>
       </div>
       <div class="front-caption" data-front-caption>
@@ -187,7 +187,7 @@
   </div>
 </main>
 
-<script src="assets/featured.js" defer></script>
+<script src="assets/featured.js?v=20261101b" defer></script>
 
 <script>
 (function(){
@@ -237,6 +237,7 @@ function updateRise(){
   const rise=Math.round(clamp((scrollY-M.range)/M.stageH,0,1)*200)/200;
   if(rise===lastRise)return;
   lastRise=rise;
+  if(TALL)return;
   const e=rise*(2-rise);
   const s='translateZ(0) scale('+(1+e*.045).toFixed(4)+')';
   canvas.style.transform=s;
@@ -249,7 +250,7 @@ function sizeCanvas(){
   const d=Math.min(devicePixelRatio||1,TALL?1.25:1), w=stage.clientWidth, h=stage.clientHeight;
   if(!w||!h)return;
   canvas.width=Math.round(w*d); canvas.height=Math.round(h*d);
-  ctx=canvas.getContext('2d',{alpha:false,desynchronized:true}); drawnKey=-1;
+  ctx=canvas.getContext('2d',{alpha:false}); drawnKey=-1;
 }
 function paintFrame(im,alpha){
   const cw=canvas.width, ch=canvas.height, W=im.width, H=im.height;
@@ -299,7 +300,7 @@ function loadFrames(){
     const i=list[next++];
     loadOne(i).then(im=>{
       frames[i]=im;
-      if(!framesReady){framesReady=true;sizeCanvas();stage.classList.add('video-ready')}
+      if(!framesReady){framesReady=true;sizeCanvas();stage.classList.add('video-ready');setTimeout(()=>{posterLayer.style.visibility='hidden'},700)}
       if(rafId===null&&heroOnScreen){drawnKey=-1;drawFrame(shown,true)}
     }).catch(()=>{}).then(()=>{
       done++;

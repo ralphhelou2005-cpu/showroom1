@@ -80,7 +80,10 @@ const WINDOWS = {
   });
 
   if (afterHero) {
-    const fetchAhead = () => front.querySelectorAll('img').forEach(i => { i.loading = 'eager'; });
+    const fetchAhead = () => front.querySelectorAll('img').forEach(i => {
+      i.loading = 'eager';
+      if (i.decode) i.decode().catch(() => {});
+    });
     const idle = () => ('requestIdleCallback' in window ? requestIdleCallback(fetchAhead, { timeout: 3000 }) : setTimeout(fetchAhead, 1500));
     if (document.readyState === 'complete') idle(); else addEventListener('load', idle, { once: true });
   }

@@ -40,7 +40,7 @@ Made with fal (Kling 4, Nano Banana Pro) for this site.
 
 | Site files | Notes |
 |---|---|
-| `assets/hero-frames/*`, `assets/hero-frames-wide/*`, `assets/hero-frames-phone/*`, `assets/hero-ending*` | Walk-in video, started from the owner's photo |
+| `assets/hero-frames-hd/*`, `assets/hero-frames-phone/*`, `assets/hero-ending*` | Walk-in video, started from the owner's photo |
 | `assets/build-scrub*`, `assets/stage-*`, `assets/color-*`, `assets/step-3*` | Hold-to-build car, unbadged, labeled as illustration only |
 
 ## Fonts

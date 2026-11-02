@@ -15,7 +15,7 @@
 <link rel="preload" href="assets/fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="assets/hero-poster.webp" imagesrcset="assets/hero-poster-1100.webp 1100w, assets/hero-poster.webp 1728w" imagesizes="(orientation:portrait) 420px, 100vw" fetchpriority="high">
-<link rel="stylesheet" href="assets/site.css?v=20261102f">
+<link rel="stylesheet" href="assets/site.css?v=20261102g">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -182,7 +182,7 @@
   </div>
 </main>
 
-<script src="assets/featured.js?v=20261102f" defer></script>
+<script src="assets/featured.js?v=20261102g" defer></script>
 
 <script>
 (function(){
@@ -209,16 +209,16 @@ $$('[data-split]').forEach((el,n)=>{
 
 /* ---------- the hero scrub ---------- */
 const SMALL=matchMedia('(max-width: 820px), (pointer: coarse)').matches;
-/* every screen draws prepared, already-decoded pictures on a canvas: seeking a video on every scroll step is what lagged */
+/* every screen draws prepared full-HD pictures on a canvas: seeking a video on every scroll step is what lagged.
+   All screens use the same 121 pictures, spaced by how much the view changes, so the walk keeps one even pace. */
 const TALL=innerHeight>innerWidth, PHONE=TALL&&innerWidth/innerHeight<.7;
-const FRAMES=PHONE?121:TALL?73:97, FRAME_DIR=PHONE?'assets/hero-frames-phone/':TALL?'assets/hero-frames/':'assets/hero-frames-wide/';
-/* tall screens: where the view is centred in each moment of the walk-in, in pixels of that screen's pictures
-   (phones: 960x720, tablets: 854x640). It pans from the sign to the red car's bay, then follows the car so the camera walks straight at it.
-   Phone pictures are spaced by how much the view changes, so the walk keeps one even pace from start to end. */
-const PAN=PHONE?[226,226,226,226.9,232.2,241.8,255.3,272.4,292.5,315.3,340.3,367.1,395.3,424.4,454,483.7,513,541.6,569,594.8,618.5,639.7,658.1,673.1,684.3,691.4,693.8,693.7,693.6,693.4,693.2,693.1,692.9,692.8,692.6,692.4,692.2,692,691.7,691.5,691.2,690.9,690.6,690.3,690,689.6,689.2,688.8,688.2,687.7,687.1,686.6,686.1,685.8,685.6,685.6,685.5,685.5,685.5,685.5,685.4,685.3,685.1,684.6,683.9,683,681.9,680.7,679.4,678.2,677.1,676,674.8,673.6,672.2,670.7,669,667.1,665.1,662.9,660.5,658,655.3,652.6,649.8,647,643.9,640.5,636.7,632.4,627.5,622.3,617.2,612.7,608.9,606.2,604.3,603.2,602.5,602.2,602.1,602,602,602,602,602,602,602,602,602,602,602,602,602,602,602,602,602,602,602,602]:[200.9,200.9,200.9,204.7,214.5,229.6,249.4,273,299.8,329.1,360.2,392.4,425,457.2,488.3,517.7,544.7,568.4,588.3,603.6,613.7,617.7,617.8,617.6,617.4,617.1,616.9,616.6,616.4,616.2,616,615.7,615.4,615,614.5,614,613.4,612.7,612,611.3,610.8,610.4,610.1,610,609.9,609.7,609.2,608.5,607.3,605.8,604,602.1,600.1,597.9,595.5,592.9,590,587.1,584,580.7,577.2,573.2,568.6,563.4,557.6,551.9,546.8,542.9,540.3,539,538.3,538.1,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538];
+const FRAMES=121, FRAME_DIR=PHONE?'assets/hero-frames-phone/':'assets/hero-frames-hd/';
+/* tall screens: where the view is centred in each moment, in pixels of the 1920x1080 picture.
+   It pans from the sign to the red car's bay, then follows the car so the camera walks straight at it. */
+const PAN=[339,339,339,340.4,348.3,362.7,383,408.6,438.8,473,510.5,550.7,593,636.6,681,725.5,769.5,812.4,853.5,892.2,927.8,959.6,987.2,1009.7,1026.4,1037.1,1040.7,1040.6,1040.4,1040.1,1039.8,1039.7,1039.3,1039.2,1038.9,1038.6,1038.3,1038,1037.6,1037.2,1036.8,1036.3,1035.9,1035.4,1035,1034.4,1033.8,1033.2,1032.3,1031.6,1030.7,1029.9,1029.2,1028.7,1028.4,1028.4,1028.2,1028.2,1028.2,1028.2,1028.1,1027.9,1027.7,1026.9,1025.8,1024.5,1022.8,1021.1,1019.1,1017.3,1015.7,1014,1012.2,1010.4,1008.3,1006.1,1003.5,1000.7,997.7,994.3,990.8,987,982.9,978.9,974.7,970.5,965.8,960.8,955.1,948.6,941.2,933.4,925.8,919.1,913.3,909.3,906.4,904.8,903.8,903.3,903.2,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903];
 const panAt=p=>{const x=p*(PAN.length-1), a=Math.min(PAN.length-2,Math.floor(x));return PAN[a]+(PAN[a+1]-PAN[a])*(x-a)};
 /* phone pictures are cut to the strip a phone shows around that moment: where each strip starts in the full picture */
-const CROP=PHONE?[0,0,0,0,1,7,16,30,47,67,90,115,141,170,199,228,258,287,316,343,369,393,414,432,447,459,466,468,468,468,467,467,467,467,467,467,466,466,466,466,465,465,465,464,464,464,463,463,462,461,461,460,460,460,460,460,460,460,460,460,460,459,459,458,457,456,455,454,453,451,450,449,448,447,445,443,441,439,437,435,432,430,427,424,421,418,415,411,407,402,397,392,387,383,381,379,378,377,377,376,376,376,376,376,376,376,376,376,376,376,376,376,376,376,376,376,376,376,376,376,376]:null;
+const CROP=PHONE?[2,2,2,2,3,11,25,46,71,102,136,173,213,256,299,344,388,432,475,516,555,591,622,650,672,689,700,703,703,703,702,702,702,702,701,701,701,700,700,700,699,699,698,698,697,697,696,695,694,693,693,692,691,691,691,691,691,691,691,691,691,690,690,689,687,686,684,682,680,678,677,675,673,671,669,666,663,660,657,654,650,646,642,637,633,629,624,618,611,604,596,589,582,576,572,569,568,567,566,566,566,566,566,566,566,566,566,566,566,566,566,566,566,566,566,566,566,566,566,566,566]:null;
 const stage=$('#stage'), hero=$('.hero'), ring=$('#ring'), posterLayer=$('#poster'), cue=$('#cue'), canvas=$('#frames');
 const bands=$$('.band').map((el,i,all)=>({el,a:+el.dataset.a,b:+el.dataset.b,first:i===0,last:i===all.length-1,op:-1,k:-1}));
 let target=0,shown=0,rafId=null,lastTick=0,heroOnScreen=true,scrubOn=false,heroInit=false;
@@ -246,20 +246,24 @@ function updateRise(){
   canvas.style.transform=s;
   posterLayer.style.transform=s;
 }
-/* ---------- prepared pictures for tall screens ---------- */
-const frames=new Array(FRAMES);
-let ctx=null,drawnKey=-1,framesReady=false;
+/* ---------- the walk-in pictures ----------
+   Every picture is downloaded once and kept compressed. Only the few around the current spot are decoded,
+   in a background thread, so full-HD pictures never fill the memory or block scrolling. */
+const frames=new Array(FRAMES), have=new Uint8Array(FRAMES), decoding=new Set(), blobs=[];
+const WIN=PHONE?6:8;   /* decoded pictures kept on each side of the current one */
+let ctx=null,drawnKey='',framesReady=false,center=0,dir=1,worker=null,fetchList=[],fetchNext=0,fetched=0;
+const frameUrl=i=>FRAME_DIR+'f'+String(i+1).padStart(3,'0')+'.webp';
 function sizeCanvas(){
-  const d=Math.min(devicePixelRatio||1,TALL?1.25:1), w=stage.clientWidth, h=stage.clientHeight;
+  /* the canvas matches the pictures' own detail (at most 1080 tall), and the screen does any remaining scaling */
+  const w=stage.clientWidth, h=stage.clientHeight;
   if(!w||!h)return;
-  /* phones: the canvas holds exactly the picture's own pixels, so every draw is a straight copy and the screen does the scaling */
-  if(PHONE){canvas.height=720;canvas.width=Math.round(720*w/h)}
-  else{canvas.width=Math.round(w*d);canvas.height=Math.round(h*d)}
-  ctx=canvas.getContext('2d',{alpha:false}); drawnKey=-1;
+  const d=Math.min(devicePixelRatio||1,1080/h);
+  canvas.width=Math.round(w*d); canvas.height=Math.round(h*d);
+  ctx=canvas.getContext('2d',{alpha:false}); drawnKey='';
 }
 function paintFrame(im,alpha,i){
-  const cw=canvas.width, ch=canvas.height, W=im.width, H=im.height, full=CROP?960:W;
-  /* cover-fit; tall screens' pictures hold the left three quarters of the wide shot */
+  const cw=canvas.width, ch=canvas.height, W=im.width, H=im.height, full=TALL?1440:W;
+  /* cover-fit; tall screens look into the left three quarters of the wide shot */
   let sw=cw/ch*H, sh=H;
   if(sw>W){sw=W;sh=W*ch/cw}
   const at=TALL?lastOx-sw/2:(H*16/9-sw)*lastOx/100;
@@ -272,50 +276,86 @@ function nearestFrame(i){
   for(let d=1;d<FRAMES;d++){if(frames[i-d])return i-d;if(frames[i+d])return i+d}
   return -1;
 }
-function drawFrame(p,atRest){
+function drawFrame(p){
   if(!ctx)return;
-  const pos=p*(FRAMES-1), a=Math.floor(pos);
-  /* mostly one sharp picture, with a short blend between neighbours while moving; a single picture at rest */
-  const m=clamp((pos-a-.3)/.4,0,1), mix=atRest?(pos-a>=.5?1:0):Math.round(m*16)/16;
-  const key=(a*17+mix*16)*1000+lastOx;
+  const pos=p*(FRAMES-1), a=Math.min(FRAMES-2,Math.floor(pos));
+  if(a!==center){dir=a>center?1:-1;center=a;fillWindow()}
+  /* a continuous blend between neighbouring pictures, so even a slow scroll glides */
+  const mix=Math.round((pos-a)*32)/32, key=a+'|'+mix+'|'+lastOx;
   if(key===drawnKey)return;
-  const nx=frames[a+1], i=nearestFrame(a);
-  if(i<0)return;
-  drawnKey=key;
-  if(mix===1&&nx){paintFrame(nx,1,a+1);return}
-  paintFrame(frames[i],1,i);
-  if(i===a&&mix>0&&nx)paintFrame(nx,mix,a+1);
+  const A=frames[a], B=frames[a+1];
+  if(A&&B){
+    drawnKey=key;
+    paintFrame(A,1,a);
+    if(mix>0)paintFrame(B,mix,a+1);
+  }else{
+    const i=nearestFrame(Math.round(pos));
+    if(i<0)return;
+    drawnKey=key;
+    paintFrame(frames[i],1,i);
+  }
   ctx.globalAlpha=1;
 }
-function loadOne(i){
-  const url=FRAME_DIR+'f'+String(i+1).padStart(3,'0')+'.webp';
-  /* decoded ahead of time, so drawing never has to decode during a scroll */
-  if('createImageBitmap' in window)return fetch(url).then(r=>{if(!r.ok)throw 0;return r.blob()}).then(b=>createImageBitmap(b));
-  const im=new Image(); im.src=url;
-  return im.decode().then(()=>im);
+function fillWindow(){
+  for(let i=0;i<FRAMES;i++)if(frames[i]&&Math.abs(i-center)>WIN+2){if(frames[i].close)frames[i].close();frames[i]=undefined}
+  /* the closest missing pictures first, the ones ahead before the ones behind, two at a time */
+  for(let d=0;d<=WIN&&decoding.size<2;d++){
+    for(const i of d?[center+dir*d,center-dir*d]:[center]){
+      if(i<0||i>=FRAMES||frames[i]||!have[i]||decoding.has(i)||decoding.size>=2)continue;
+      decoding.add(i); decodeOne(i);
+    }
+  }
 }
+function onDecoded(i,im){
+  decoding.delete(i);
+  if(im&&Math.abs(i-center)>WIN+2){if(im.close)im.close();im=null}
+  if(im){
+    frames[i]=im;
+    if(!framesReady){framesReady=true;sizeCanvas();stage.classList.add('video-ready');setTimeout(()=>{posterLayer.style.visibility='hidden'},700)}
+    if(rafId===null&&heroOnScreen){drawnKey='';drawFrame(shown)}
+  }
+  fillWindow();
+}
+function onFetched(i,ok){
+  if(ok)have[i]=1;
+  fetched++;
+  ring.style.setProperty('--ld',Math.round(126*(1-fetched/fetchList.length)));
+  if(fetched===fetchList.length)ring.style.opacity=0;
+  if(ok)fillWindow();
+  pumpFetch();
+}
+/* the background thread keeps the downloaded pictures and turns them into ready-to-draw bitmaps on request */
+const WORKER=`const B=new Map();
+const get=(i,u)=>B.has(i)?Promise.resolve(B.get(i)):fetch(u).then(r=>{if(!r.ok)throw 0;return r.blob()}).then(b=>{B.set(i,b);return b});
+onmessage=e=>{const m=e.data;
+  if(m.t==='get')get(m.i,m.u).then(()=>postMessage({t:'got',i:m.i,ok:1}),()=>postMessage({t:'got',i:m.i,ok:0}));
+  else get(m.i,m.u).then(b=>createImageBitmap(b)).then(bm=>postMessage({t:'bm',i:m.i,bm},[bm]),()=>postMessage({t:'bm',i:m.i,bm:null}));
+};`;
+function startWorker(){
+  try{
+    worker=new Worker(URL.createObjectURL(new Blob([WORKER],{type:'text/javascript'})));
+    worker.onmessage=e=>{const m=e.data;if(m.t==='got')onFetched(m.i,m.ok);else onDecoded(m.i,m.bm)};
+  }catch(e){worker=null}
+}
+function fetchOne(i){
+  if(worker){worker.postMessage({t:'get',i,u:new URL(frameUrl(i),location.href).href});return}
+  fetch(frameUrl(i)).then(r=>{if(!r.ok)throw 0;return r.blob()}).then(b=>{blobs[i]=b;onFetched(i,true)},()=>onFetched(i,false));
+}
+function decodeOne(i){
+  if(worker){worker.postMessage({t:'dec',i,u:new URL(frameUrl(i),location.href).href});return}
+  if('createImageBitmap' in window&&blobs[i]){createImageBitmap(blobs[i]).then(bm=>onDecoded(i,bm),()=>onDecoded(i,null));return}
+  const im=new Image(); im.src=frameUrl(i); im.decode().then(()=>onDecoded(i,im),()=>onDecoded(i,null));
+}
+function pumpFetch(){if(fetchNext<fetchList.length)fetchOne(fetchList[fetchNext++])}
 function loadFrames(){
   const seen=new Set(), order=[];
   /* coarse first, so the walk-in works early and fills in as more pictures arrive */
   [8,4,2,1].forEach(step=>{for(let i=0;i<FRAMES;i+=step)if(!seen.has(i)){seen.add(i);order.push(i)}});
   const c=navigator.connection, light=c&&(c.saveData||/2g/.test(c.effectiveType||''));
-  const list=light?order.filter(i=>i%4===0):order;
-  let next=0,done=0;
-  const pump=()=>{
-    if(next>=list.length)return;
-    const i=list[next++];
-    loadOne(i).then(im=>{
-      frames[i]=im;
-      if(!framesReady){framesReady=true;sizeCanvas();stage.classList.add('video-ready');setTimeout(()=>{posterLayer.style.visibility='hidden'},700)}
-      if(rafId===null&&heroOnScreen){drawnKey=-1;drawFrame(shown,true)}
-    }).catch(()=>{}).then(()=>{
-      done++;
-      ring.style.setProperty('--ld',Math.round(126*(1-done/list.length)));
-      if(done===list.length)ring.style.opacity=0;
-      pump();
-    });
-  };
-  for(let n=0;n<(TALL?4:6);n++)pump();
+  fetchList=light?order.filter(i=>i%4===0):order;
+  center=Math.min(FRAMES-2,Math.floor(shown*(FRAMES-1)));
+  if('createImageBitmap' in window&&'Worker' in window)startWorker();
+  for(let n=0;n<(PHONE?4:6);n++)pumpFetch();
 }
 function updateCaptions(p){
   bands.forEach(b=>{
@@ -336,7 +376,7 @@ function updateCaptions(p){
   if(ox!==lastOx){
     lastOx=ox;
     if(!framesReady){
-      const fh=PHONE?720:640, sw=fh*innerWidth/innerHeight;
+      const fh=1080, sw=fh*innerWidth/innerHeight;
       posterLayer.style.objectPosition=(TALL?clamp((ox-sw/2)/(fh*16/9-sw)*100,0,100):ox)+'% 50%';
     }
   }
@@ -347,7 +387,7 @@ function tick(now){
   if(Math.abs(target-shown)<.0005){shown=target;rafId=null;lastTick=0}
   else rafId=requestAnimationFrame(tick);
   updateCaptions(shown);
-  drawFrame(shown,rafId===null);
+  drawFrame(shown);
 }
 function onScroll(){
   target=heroProgress();

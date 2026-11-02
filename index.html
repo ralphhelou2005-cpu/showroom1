@@ -15,7 +15,7 @@
 <link rel="preload" href="assets/fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="assets/hero-poster.webp" imagesrcset="assets/hero-poster-1100.webp 1100w, assets/hero-poster.webp 1728w" imagesizes="(orientation:portrait) 420px, 100vw" fetchpriority="high">
-<link rel="stylesheet" href="assets/site.css?v=20261102a">
+<link rel="stylesheet" href="assets/site.css?v=20261102d">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -182,7 +182,7 @@
   </div>
 </main>
 
-<script src="assets/featured.js?v=20261102a" defer></script>
+<script src="assets/featured.js?v=20261102d" defer></script>
 
 <script>
 (function(){
@@ -210,7 +210,14 @@ $$('[data-split]').forEach((el,n)=>{
 /* ---------- the hero scrub ---------- */
 const SMALL=matchMedia('(max-width: 820px), (pointer: coarse)').matches;
 /* every screen draws prepared, already-decoded pictures on a canvas: seeking a video on every scroll step is what lagged */
-const TALL=innerHeight>innerWidth, FRAMES=TALL?73:97, FRAME_DIR=TALL?'assets/hero-frames/':'assets/hero-frames-wide/';
+const TALL=innerHeight>innerWidth, PHONE=TALL&&innerWidth/innerHeight<.7;
+const FRAMES=PHONE?97:TALL?73:97, FRAME_DIR=PHONE?'assets/hero-frames-phone/':TALL?'assets/hero-frames/':'assets/hero-frames-wide/';
+/* tall screens: where the view is centred in each moment of the walk-in, in pixels of the 854x640 picture.
+   It pans from the sign to the red car's bay, then follows the car so the camera walks straight at it. */
+const PAN=[200.9,200.9,200.9,204.7,214.5,229.6,249.4,273,299.8,329.1,360.2,392.4,425,457.2,488.3,517.7,544.7,568.4,588.3,603.6,613.7,617.7,617.8,617.6,617.4,617.1,616.9,616.6,616.4,616.2,616,615.7,615.4,615,614.5,614,613.4,612.7,612,611.3,610.8,610.4,610.1,610,609.9,609.7,609.2,608.5,607.3,605.8,604,602.1,600.1,597.9,595.5,592.9,590,587.1,584,580.7,577.2,573.2,568.6,563.4,557.6,551.9,546.8,542.9,540.3,539,538.3,538.1,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538,538];
+const panAt=p=>{const x=p*(PAN.length-1), a=Math.min(PAN.length-2,Math.floor(x));return PAN[a]+(PAN[a+1]-PAN[a])*(x-a)};
+/* phone pictures are cut to the strip a phone shows around that moment: where each strip starts in the full picture */
+const CROP=PHONE?[0,0,0,0,0,1,16,36,59,86,115,146,179,211,243,275,304,331,355,375,390,400,404,404,403,403,403,403,403,402,402,402,401,401,400,400,399,398,398,397,397,396,396,396,396,396,395,394,392,390,388,386,384,382,379,376,373,370,367,364,360,355,350,344,338,333,329,327,325,325,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324,324]:null;
 const stage=$('#stage'), hero=$('.hero'), ring=$('#ring'), posterLayer=$('#poster'), cue=$('#cue'), canvas=$('#frames');
 const bands=$$('.band').map((el,i,all)=>({el,a:+el.dataset.a,b:+el.dataset.b,first:i===0,last:i===all.length-1,op:-1,k:-1}));
 let target=0,shown=0,rafId=null,lastTick=0,heroOnScreen=true,scrubOn=false,heroInit=false;
@@ -244,15 +251,18 @@ let ctx=null,drawnKey=-1,framesReady=false;
 function sizeCanvas(){
   const d=Math.min(devicePixelRatio||1,TALL?1.25:1), w=stage.clientWidth, h=stage.clientHeight;
   if(!w||!h)return;
-  canvas.width=Math.round(w*d); canvas.height=Math.round(h*d);
+  /* phones: the canvas holds exactly the picture's own pixels, so every draw is a straight copy and the screen does the scaling */
+  if(PHONE){canvas.height=640;canvas.width=Math.round(640*w/h)}
+  else{canvas.width=Math.round(w*d);canvas.height=Math.round(h*d)}
   ctx=canvas.getContext('2d',{alpha:false}); drawnKey=-1;
 }
-function paintFrame(im,alpha){
-  const cw=canvas.width, ch=canvas.height, W=im.width, H=im.height;
+function paintFrame(im,alpha,i){
+  const cw=canvas.width, ch=canvas.height, W=im.width, H=im.height, full=CROP?854:W;
   /* cover-fit; tall screens' pictures hold the left three quarters of the wide shot */
   let sw=cw/ch*H, sh=H;
   if(sw>W){sw=W;sh=W*ch/cw}
-  const sx=clamp((H*16/9-sw)*lastOx/100,0,W-sw);
+  const at=TALL?lastOx-sw/2:(H*16/9-sw)*lastOx/100;
+  const sx=clamp(clamp(at,0,full-sw)-(CROP?CROP[i]:0),0,W-sw);
   ctx.globalAlpha=alpha;
   ctx.drawImage(im,sx,(H-sh)/2,sw,sh,0,0,cw,ch);
 }
@@ -265,15 +275,15 @@ function drawFrame(p,atRest){
   if(!ctx)return;
   const pos=p*(FRAMES-1), a=Math.floor(pos);
   /* mostly one sharp picture, with a short blend between neighbours while moving; a single picture at rest */
-  const m=clamp((pos-a-.3)/.4,0,1), mix=atRest?(pos-a>=.5?1:0):Math.round(m*16)/16;
+  const m=PHONE?clamp((pos-a-.2)/.6,0,1):clamp((pos-a-.3)/.4,0,1), mix=atRest?(pos-a>=.5?1:0):Math.round(m*16)/16;
   const key=(a*17+mix*16)*1000+lastOx;
   if(key===drawnKey)return;
   const nx=frames[a+1], i=nearestFrame(a);
   if(i<0)return;
   drawnKey=key;
-  if(mix===1&&nx){paintFrame(nx,1);return}
-  paintFrame(frames[i],1);
-  if(i===a&&mix>0&&nx)paintFrame(nx,mix);
+  if(mix===1&&nx){paintFrame(nx,1,a+1);return}
+  paintFrame(frames[i],1,i);
+  if(i===a&&mix>0&&nx)paintFrame(nx,mix,a+1);
   ctx.globalAlpha=1;
 }
 function loadOne(i){
@@ -320,12 +330,14 @@ function updateCaptions(p){
   const gone=p>.012; if(gone!==lastCue){lastCue=gone;cue.classList.toggle('gone',gone)}
   /* the real sign is the logo while it is in view, so the nav mark waits; keep the sign in frame on narrower screens */
   const sign=p<.3; if(sign!==lastSign){lastSign=sign;nav.classList.toggle('on-sign',sign)}
-  /* on a tall screen, pan from the sign to the red car's bay, then hold it centered */
-  const raw=M.tall?(p<.22?5+54*smoothstep(p,.02,.22):59-12*smoothstep(p,.5,.92)):30+20*clamp(p/.25,0,1);
-  const ox=Math.round(raw*2)/2;
+  /* tall screens: the view centre in picture pixels; wide screens: a percent pan */
+  const ox=Math.round((TALL?panAt(p):30+20*clamp(p/.25,0,1))*2)/2;
   if(ox!==lastOx){
     lastOx=ox;
-    if(!framesReady)posterLayer.style.objectPosition=ox+'% 50%';
+    if(!framesReady){
+      const sw=640*innerWidth/innerHeight;
+      posterLayer.style.objectPosition=(TALL?clamp((ox-sw/2)/(1138-sw)*100,0,100):ox)+'% 50%';
+    }
   }
 }
 function tick(now){
@@ -450,7 +462,8 @@ async function loadBuild(){
     bvid.addEventListener('canplay',()=>{bSeek(bp*bvid.duration);bay.classList.add('video-ready')},{once:true});
   }catch(e){/* stills carry the build */}
 }
-new IntersectionObserver((e,o)=>{if(e[0].isIntersecting){loadBuild();o.disconnect()}},{rootMargin:'120% 0px'}).observe(bay);
+/* phones fetch the build film only when it is close, so nothing heavy loads while the walk-in ends */
+new IntersectionObserver((e,o)=>{if(e[0].isIntersecting){loadBuild();o.disconnect()}},{rootMargin:SMALL?'40% 0px':'120% 0px'}).observe(bay);
 
 function renderBuild(){
   const s=Math.min(4,Math.floor(bp*5));

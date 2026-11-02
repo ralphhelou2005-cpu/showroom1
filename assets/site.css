@@ -70,26 +70,11 @@ h2{font-size:clamp(40px,6vw,88px)}
 .poster,.frames{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .frames{opacity:0;transition:opacity .4s var(--ease);will-change:transform}
 .stage.video-ready .frames{opacity:1}
-/* the walk-in: four stills the camera moves through, glass doors and light, all moved by the graphics chip */
-.scenes{position:absolute;inset:0;overflow:hidden;background:#07070b}
-.scene{position:absolute;left:0;top:0;transform-origin:0 0;visibility:hidden;will-change:transform,opacity}
-.scene img{display:block;width:100%;height:100%}
-/* the glass opening of the third picture, in fractions of the picture */
-.doorway{position:absolute;left:19.6%;top:2.2%;width:59.3%;height:86%;overflow:hidden;pointer-events:none}
-.pane{position:absolute;top:0;bottom:0;width:50%;opacity:0;overflow:hidden;will-change:transform,opacity;
-  background:linear-gradient(180deg,rgba(220,228,242,.22),rgba(170,180,204,.12) 55%,rgba(220,228,242,.2));
-  box-shadow:inset 0 0 0 1px rgba(241,228,201,.3)}
-/* the name etched across the middle of the doors: each door holds its half, so it splits as they part */
-.pane em{position:absolute;top:30%;transform:translate(-50%,-50%);font:400 calc(var(--bw,1600px)*.021)/1 var(--display);font-style:normal;
-  letter-spacing:.52em;padding-left:.52em;white-space:nowrap;color:rgba(241,228,201,.62);text-shadow:0 0 calc(var(--bw,1600px)*.004) rgba(255,240,214,.35)}
-.pane.l em{left:100%}
-.pane.r em{left:0}
-.pane.l{left:0;border-right:1px solid rgba(241,228,201,.6)}
-.pane.r{right:0;border-left:1px solid rgba(241,228,201,.6)}
-.pane b{position:absolute;inset:-10% -40%;will-change:transform;
-  background:linear-gradient(104deg,transparent 38%,rgba(255,250,240,.16) 46%,rgba(255,255,255,.34) 49.5%,rgba(255,236,204,.14) 53%,transparent 60%)}
-.bloom{position:absolute;inset:0;opacity:0;pointer-events:none;will-change:opacity;
-  background:radial-gradient(ellipse 62% 58% at 50% 52%,rgba(255,246,230,.95),rgba(255,234,204,.42) 42%,rgba(255,234,204,0) 74%)}
+/* the walk-in film, with its finishing touches: cinematic bars and a sweep of gold light */
+.film-wrap{position:absolute;inset:0;overflow:hidden;background:#07070b}
+.lb{position:absolute;left:0;right:0;height:9vh;height:9svh;background:#050508;pointer-events:none;will-change:transform}
+.lb-t{top:0;box-shadow:0 1px 0 rgba(241,228,201,.28)}
+.lb-b{bottom:0;box-shadow:0 -1px 0 rgba(241,228,201,.28)}
 .sweep{position:absolute;inset:-30% -20%;opacity:0;pointer-events:none;will-change:transform,opacity;
   background:linear-gradient(104deg,transparent 40%,rgba(241,228,201,.10) 46%,rgba(255,248,236,.32) 50%,rgba(241,228,201,.10) 54%,transparent 60%)}
 .scrim{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 120% 90% at 50% 45%,rgba(10,10,18,0) 40%,rgba(10,10,18,.55) 100%),linear-gradient(rgba(10,10,18,.5),transparent 16%)}

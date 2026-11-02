@@ -14,8 +14,9 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111218'/%3E%3Cpath d='M6 24 11 8h4l2 9 6-9h4l-5 16h-4l3-9-6 9h-2l-2-9-3 9z' fill='%23EFEDF4'/%3E%3Cpath d='M4 28h24' stroke='%23E3262E' stroke-width='2'/%3E%3C/svg%3E">
 <link rel="preload" href="assets/fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" as="image" href="assets/walk/s0.avif" type="image/avif" fetchpriority="high">
-<link rel="stylesheet" href="assets/site.css?v=20261102n">
+<link rel="preload" as="image" href="assets/walk/first.webp" media="(min-aspect-ratio: 7/10)" fetchpriority="high">
+<link rel="preload" as="image" href="assets/walk/first-phone.webp" media="(max-aspect-ratio: 7/10)" fetchpriority="high">
+<link rel="stylesheet" href="assets/site.css?v=20261102p">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -34,13 +35,11 @@
 <main id="main" tabindex="-1">
   <div id="top" class="hero">
     <div class="stage" id="stage">
-      <div class="scenes" id="scenes" aria-hidden="true">
-        <div class="scene" data-scene="0"><picture><source type="image/avif" srcset="assets/walk/s0.avif"><img src="assets/walk/s0.webp" width="3840" height="2160" alt="" decoding="async" fetchpriority="high"></picture></div>
-        <div class="scene" data-scene="1"><picture><source type="image/avif" srcset="assets/walk/s1.avif"><img src="assets/walk/s1.webp" width="3840" height="2160" alt="" decoding="async"></picture></div>
-        <div class="scene" data-scene="2"><picture><source type="image/avif" srcset="assets/walk/s2.avif"><img src="assets/walk/s2.webp" width="3840" height="2160" alt="" decoding="async"></picture><div class="doorway"><i class="pane l"><b></b><em>MILCAR</em></i><i class="pane r"><b></b><em>MILCAR</em></i></div></div>
-        <div class="scene" data-scene="3"><picture><source type="image/avif" srcset="assets/walk/s3.avif"><img src="assets/walk/s3.webp" width="3840" height="2160" alt="" decoding="async"></picture></div>
-        <div class="bloom" id="bloom"></div>
+      <div class="film-wrap" id="filmWrap" aria-hidden="true">
+        <picture><source media="(max-aspect-ratio: 7/10)" srcset="assets/walk/first-phone.webp"><img class="poster" id="poster" src="assets/walk/first.webp" width="1920" height="1080" alt="" fetchpriority="high" decoding="async"></picture>
+        <video class="frames" id="frames" muted playsinline preload="none" disablepictureinpicture></video>
         <div class="sweep" id="sweep"></div>
+        <i class="lb lb-t"></i><i class="lb lb-b"></i>
       </div>
       <div class="scrim" aria-hidden="true"></div>
       <div class="band b1" data-a="0" data-b=".24" style="opacity:1;--k:1"><p>Milcar. Come inside.</p></div>
@@ -188,7 +187,7 @@
   </div>
 </main>
 
-<script src="assets/featured.js?v=20261102n" defer></script>
+<script src="assets/featured.js?v=20261102p" defer></script>
 
 <script>
 (function(){
@@ -215,11 +214,16 @@ $$('[data-split]').forEach((el,n)=>{
 
 /* ---------- the hero scrub ---------- */
 const SMALL=matchMedia('(max-width: 820px), (pointer: coarse)').matches;
-/* the walk-in: four ultra-sharp stills from the walk (upscaled to 4K) and a camera that moves through them.
-   It pushes in, passes from one picture to the next through a soft light, and at the glass the doors part.
-   Everything moves on the graphics chip, and the four pictures weigh under 1 MB together, so the walk is ready at once. */
-const TALL=innerHeight>innerWidth;
-const stage=$('#stage'), hero=$('.hero'), ring=$('#ring'), cue=$('#cue'), scenesEl=$('#scenes');
+/* the walk-in: a cinematic film made with fal (one continuous glide from the street, through the glass, to the red car).
+   The scroll picks the frame and the device's video hardware draws it. A light copy streams in first so the walk starts at once;
+   the full-quality film follows and takes over at the same frame. */
+const TALL=innerHeight>innerWidth, PHONE=TALL&&innerWidth/innerHeight<.7;
+const FILMS=PHONE?{fast:['assets/walk/fast-phone.mp4',15,120],hd:['assets/walk/hd-phone.mp4',30,240]}
+                 :{fast:['assets/walk/fast.mp4',15,120],hd:['assets/walk/hd.mp4',30,240]};
+const FAST_MIME='video/mp4; codecs="avc1.64001f"';
+const stage=$('#stage'), hero=$('.hero'), ring=$('#ring'), cue=$('#cue'), filmWrap=$('#filmWrap'), posterLayer=$('#poster');
+const sweep=$('#sweep'), lbs=$$('.lb');
+let film=$('#frames');
 const bands=$$('.band').map((el,i,all)=>({el,a:+el.dataset.a,b:+el.dataset.b,first:i===0,last:i===all.length-1,op:-1,k:-1}));
 let target=0,shown=0,rafId=null,lastTick=0,heroOnScreen=true,scrubOn=false,heroInit=false;
 let lastOx=-1,lastRise=-1,lastCue=null,lastSign=null;
@@ -230,124 +234,152 @@ const M={range:1,panelTop:1e9,stageH:innerHeight,tall:TALL,w:innerWidth,h:innerH
 function measure(){
   M.panelTop=panel.offsetTop;
   M.stageH=stage.offsetHeight||innerHeight;
-  M.w=stage.clientWidth||innerWidth; M.h=M.stageH;
-  /* each picture's size when it just covers the screen */
-  if(M.w/M.h>16/9){M.bw=M.w;M.bh=M.w*9/16}else{M.bh=M.h;M.bw=M.h*16/9}
-  scenesEl.style.setProperty('--bw',M.bw+'px');
-  scenes.forEach(c=>{c.el.style.width=M.bw+'px';c.el.style.height=M.bh+'px';c.t=''});
   M.range=M.panelTop-hero.offsetTop-M.stageH;   /* the walk-in ends exactly when the website panel reaches the bottom of the screen */
   M.tall=innerHeight>innerWidth;
 }
 function heroProgress(){return M.range>0?clamp(scrollY/M.range,0,1):0}
-/* while the panel rises, the held frame stays bright with a slow push in */
-function updateRise(){
-  if(!scrubOn)return;
-  const rise=Math.round(clamp((scrollY-M.range)/M.stageH,0,1)*200)/200;
-  if(rise===lastRise)return;
-  lastRise=rise;
-  if(TALL)return;
-  const e=rise*(2-rise);
-  scenesEl.style.transform='translateZ(0) scale('+(1+e*.045).toFixed(4)+')';
+/* while the panel rises, the last frame simply holds still: zooming a video while the panel slides over it made it flicker */
+function updateRise(){}
+/* ---------- the walk-in film ----------
+   Made for scrubbing: no reordered frames and a full picture every few frames, so any moment is a few milliseconds away.
+   Until the whole film has arrived, the walk (picture and words together) goes only as far as the film has. */
+let filmReady=false, seeking=false, wantF=-1, atF=-1, pendF=-1, reach=0, maxF=0, lastFx='';
+film.muted=true; film.playsInline=true; film._fps=FILMS.fast[1]; film._n=FILMS.fast[2];
+function showFrame(p){
+  if(!filmReady)return;
+  wantF=Math.min(maxF,Math.round(clamp(p,0,1)*(film._n-1)));
+  /* one jump at a time, always to the latest spot */
+  if(!seeking&&wantF!==atF){seeking=true;pendF=wantF;film.currentTime=(wantF+.5)/film._fps}
 }
-/* ---------- the walk-in pictures ----------
-   One camera for all four pictures, measured by the size of the red car on screen. Each picture knows how big the car
-   is in it and where it sits, so when one picture fades into the next the car stays exactly in place and the same size.
-   The car's size in each picture, relative to the second one, and the matching points (fractions of the picture)
-   were measured from the pictures themselves. */
-const SCENES=[
-  {size:.546, fade:[0,0], wide:[[0,.5,.44],[.22,.555,.493]], tall:[[0,.17,.5],[.22,.555,.493]]},
-  {size:1,    fade:[.30,.36], wide:[[.30,.522,.465],[.60,.537,.498]]},
-  {size:2.23, fade:[.60,.66], wide:[[.60,.498,.540],[.80,.497,.533]]},
-  {size:2.81, fade:[.80,.86], wide:[[.80,.490,.545],[1,.49,.58]]}
-];
-/* how big the car is on screen over the walk (in the second picture's terms): starts on the whole facade,
-   and each picture comes in just as it covers the screen */
-const ZK=[[0,.546],[.30,1.06],[.60,2.36],[.80,2.98],[1,3.7]];
-const scenes=$$('.scene').map((el,i)=>({el,img:$('img',el),ready:false,t:'',o:-1,v:null,c:SCENES[i]}));
-const doorL=$('.pane.l'), doorR=$('.pane.r'), sheens=$$('.pane b'), bloom=$('#bloom'), sweep=$('#sweep');
-const ease=t=>t*t*(3-2*t);
-const bell=(p,c,w)=>{const x=(p-c)/w;return x*x<1?(1-x*x)*(1-x*x):0};
-let reach=0, lastFx='';
-/* a smooth curve through the zoom points (monotone, in log scale, so the push never stalls or jumps) */
-const ZL=(()=>{
-  const x=ZK.map(k=>k[0]), y=ZK.map(k=>Math.log(k[1])), n=x.length, d=[], m=[];
-  for(let i=0;i<n-1;i++)d.push((y[i+1]-y[i])/(x[i+1]-x[i]));
-  m[0]=d[0]; m[n-1]=d[n-2];
-  for(let i=1;i<n-1;i++)m[i]=d[i-1]*d[i]<=0?0:2/(1/d[i-1]+1/d[i]);
-  return p=>{
-    let i=0; while(i<n-2&&p>x[i+1])i++;
-    const h=x[i+1]-x[i], t=clamp((p-x[i])/h,0,1), t2=t*t, t3=t2*t;
-    return Math.exp((2*t3-3*t2+1)*y[i]+(t3-2*t2+t)*h*m[i]+(-2*t3+3*t2)*y[i+1]+(t3-t2)*h*m[i+1]);
-  };
-})();
-function anchor(stops,p){
-  if(p<=stops[0][0])return stops[0];
-  for(let i=1;i<stops.length;i++)if(p<=stops[i][0]){
-    const a=stops[i-1], b=stops[i], t=ease((p-a[0])/(b[0]-a[0]));
-    return [p,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t];
-  }
-  return stops[stops.length-1];
+function onSeeked(e){
+  if(e.target!==film)return;
+  seeking=false; atF=pendF;
+  if(!stage.classList.contains('video-ready')){stage.classList.add('video-ready');setTimeout(()=>{posterLayer.style.visibility='hidden'},700)}
+  if(wantF!==atF)showFrame(Math.min(shown,reach));
 }
-function drawScenes(p){
-  const n=scenes.length;
-  /* how opaque each picture is; a picture under a fully opaque one is not drawn at all */
-  const op=scenes.map(c=>c.c.fade[1]===0?1:ease(clamp((p-c.c.fade[0])/(c.c.fade[1]-c.c.fade[0]),0,1)));
-  const Z=ZL(p);
-  for(let i=0;i<n;i++){
-    const c=scenes[i];
-    let covered=false; for(let j=i+1;j<n;j++)if(op[j]>=1&&scenes[j].ready)covered=true;
-    const vis=c.ready&&op[i]>0&&!covered;
-    if(vis!==c.v){c.v=vis;c.el.style.visibility=vis?'visible':'hidden'}
-    if(!vis)continue;
-    const o=Math.round(op[i]*200)/200;
-    if(o!==c.o){c.o=o;c.el.style.opacity=o}
-    const z=Math.max(1,Z/c.c.size), [,cx,cy]=anchor((M.tall&&c.c.tall)||c.c.wide,p);
-    const W=M.bw*z, H=M.bh*z;
-    const tx=clamp(M.w/2-cx*W,M.w-W,0), ty=clamp(M.h/2-cy*H,M.h-H,0);
-    const t='translate3d('+tx.toFixed(1)+'px,'+ty.toFixed(1)+'px,0) scale('+z.toFixed(4)+')';
-    if(t!==c.t){c.t=t;c.el.style.transform=t}
-  }
-  /* the glass doors: they catch the light as you reach them, then part */
-  const dO=ease(clamp((p-.62)/.06,0,1)), dS=ease(clamp((p-.62)/.16,0,1)), dP=ease(clamp((p-.7)/.11,0,1));
-  /* light: a soft bloom and one sweep of light at each change of picture */
-  const bO=Math.max(bell(p,.33,.06)*.6,bell(p,.63,.06)*.62,bell(p,.83,.05)*.3);
-  const sw=p<.48?clamp((p-.26)/.15,0,1):clamp((p-.56)/.15,0,1), sO=Math.max(bell(p,.335,.07),bell(p,.635,.07))*.9;
-  const fx=[dO,dS,dP,bO,sw,sO].map(v=>v.toFixed(3)).join();
-  if(fx!==lastFx){
-    lastFx=fx;
-    doorL.style.opacity=doorR.style.opacity=dO;
-    doorL.style.transform='translate3d('+(-dP*101).toFixed(2)+'%,0,0)';
-    doorR.style.transform='translate3d('+(dP*101).toFixed(2)+'%,0,0)';
-    sheens.forEach(b=>b.style.transform='translate3d('+(-60+dS*120).toFixed(1)+'%,0,0)');
-    bloom.style.opacity=bO;
-    sweep.style.opacity=sO; sweep.style.transform='translate3d('+(-70+sw*140).toFixed(1)+'%,0,0) rotate(0.001deg)';
-  }
+film.addEventListener('seeked',onSeeked);
+function setReach(f,n){
+  const r=f>=n-1?1:Math.max(0,f)/(n-1);
+  if(r!==reach||f!==maxF){maxF=Math.max(0,f);reach=r;if(scrubOn)onScroll()}
 }
-/* the walk goes only as far as its pictures have arrived (they are small, this is only for the first second) */
-function growReach(){
-  const at=[.30,.60,.80,1];
-  let r=0; for(let i=0;i<scenes.length;i++){if(!scenes[i].ready)break;r=at[i]}
-  if(r!==reach){reach=r;if(scrubOn)onScroll()}
+/* the finishing touches: cinematic bars that open as the walk begins, and a sweep of gold light over the sign and the glass */
+function drawFx(p){
+  const lb=clamp(p/.07,0,1), e=lb*lb*(3-2*lb);
+  const sw=p<.35?clamp((p-.04)/.2,0,1):clamp((p-.5)/.2,0,1);
+  const bell=(c,w)=>{const x=(p-c)/w;return x*x<1?(1-x*x)*(1-x*x):0};
+  const sO=Math.max(bell(.14,.11)*.7,bell(.6,.11)*.85);
+  const fx=e.toFixed(3)+'|'+sw.toFixed(3)+'|'+sO.toFixed(3);
+  if(fx===lastFx)return; lastFx=fx;
+  lbs[0].style.transform='translate3d(0,'+(-e*101).toFixed(2)+'%,0)';
+  lbs[1].style.transform='translate3d(0,'+(e*101).toFixed(2)+'%,0)';
+  sweep.style.opacity=sO; sweep.style.transform='translate3d('+(-70+sw*140).toFixed(1)+'%,0,0)';
 }
-function loadScenes(){
-  scenes.forEach((c,i)=>{
-    const im=c.img;
-    /* a picture counts as ready as soon as it has arrived, so the walk never waits; it is then prepared for the screen
-       ahead of time and drawn once, invisibly, so its first real appearance is as smooth as the rest */
-    const done=()=>{
-      if(c.ready)return;
-      c.ready=true;
-      if(i===0)stage.classList.add('video-ready');
-      if(scenes.every(x=>x.ready))ring.style.opacity=0;
-      growReach(); drawScenes(shown);
-      (im.decode?im.decode():Promise.resolve()).catch(()=>{}).then(()=>{
-        if(c.v)return;
-        c.el.style.visibility='visible'; c.el.style.opacity=.001;
-        requestAnimationFrame(()=>requestAnimationFrame(()=>{if(!c.v){c.el.style.visibility='hidden';c.o=-1}}));
-      });
-    };
-    if(im.complete&&im.naturalWidth)done(); else im.addEventListener('load',done,{once:true});
+function filmShown(){
+  ring.style.opacity=0;
+  /* some phones only paint a paused video after it has played once */
+  const go=()=>{film.pause();filmReady=true;atF=-1;showFrame(Math.min(shown,reach))};
+  const pl=film.play();
+  if(pl&&pl.then)pl.then(go,go); else go();
+}
+/* a whole file, with the loading ring following it */
+function getBlob(url,ringOn){
+  return fetch(url).then(r=>{
+    if(!r.ok)throw 0;
+    const total=+r.headers.get('content-length')||0;
+    if(!r.body||!total)return r.blob();
+    const rd=r.body.getReader(), parts=[]; let got=0;
+    const read=()=>rd.read().then(({done,value})=>{
+      if(done)return new Blob(parts,{type:'video/mp4'});
+      parts.push(value); got+=value.length;
+      if(ringOn)ring.style.setProperty('--ld',Math.round(126*(1-got/total)));
+      return read();
+    });
+    return read();
   });
+}
+/* computers: the light copy is fed to the player in pieces as it arrives, so the walk starts within a second */
+function streamFast(){
+  return new Promise((ok,no)=>{
+    const ms=new MediaSource(); let sb=null, queue=[], ended=false, failed=false, total=0, got=0;
+    const fail=()=>{if(failed)return;failed=true;no()};
+    const grow=()=>{
+      if(!sb||!sb.buffered.length)return;
+      const n=FILMS.fast[2], f=ended&&!queue.length?n-1:Math.min(n-1,Math.floor(sb.buffered.end(sb.buffered.length-1)*FILMS.fast[1]+1e-6)-1);
+      setReach(f,n);
+    };
+    const feed=()=>{
+      if(!sb||sb.updating||failed)return;
+      if(queue.length){
+        const n=queue.reduce((a,c)=>a+c.length,0), buf=new Uint8Array(n); let o=0;
+        for(const c of queue){buf.set(c,o);o+=c.length}
+        queue=[];
+        try{sb.appendBuffer(buf)}catch(e){fail()}
+      }else if(ended&&ms.readyState==='open'){try{ms.endOfStream()}catch(e){}grow();ok()}
+    };
+    film.addEventListener('loadeddata',filmShown,{once:true});
+    ms.addEventListener('sourceopen',()=>{
+      try{sb=ms.addSourceBuffer(FAST_MIME)}catch(e){fail();return}
+      let first=true;
+      sb.addEventListener('updateend',()=>{
+        if(first){first=false;try{ms.duration=FILMS.fast[2]/FILMS.fast[1]}catch(e){}}
+        grow();feed();
+      });
+      fetch(FILMS.fast[0],{priority:'high'}).then(r=>{
+        if(!r.ok||!r.body)throw 0;
+        total=+r.headers.get('content-length')||0;
+        const rd=r.body.getReader();
+        const read=()=>rd.read().then(({done,value})=>{
+          if(done){ended=true;feed();return}
+          queue.push(value); got+=value.length;
+          if(total)ring.style.setProperty('--ld',Math.round(126*(1-got/total)));
+          feed(); return read();
+        });
+        return read();
+      }).catch(fail);
+    },{once:true});
+    film.src=URL.createObjectURL(ms);
+  });
+}
+/* any browser (and phones): the light copy as one small file */
+function wholeFast(){
+  return getBlob(FILMS.fast[0],true).then(b=>{
+    film.addEventListener('loadeddata',filmShown,{once:true});
+    film.src=URL.createObjectURL(b);
+    film.load();
+    setReach(FILMS.fast[2]-1,FILMS.fast[2]);
+  });
+}
+/* the full-quality film takes over at the same moment of the walk, in one step */
+function swapIn(b){
+  const [,fps,n]=FILMS.hd, v=document.createElement('video');
+  v.className='frames'; v.muted=true; v.playsInline=true; v._fps=fps; v._n=n;
+  v.setAttribute('muted',''); v.setAttribute('playsinline',''); v.setAttribute('disablepictureinpicture','');
+  v.style.visibility='hidden';
+  if(!PHONE)v.style.objectPosition=film.style.objectPosition;
+  film.after(v);
+  v.addEventListener('loadeddata',()=>{
+    const ready=()=>{
+      v.pause();
+      const f=Math.round(Math.max(0,atF)/(film._n-1)*(n-1));
+      v.addEventListener('seeked',()=>{
+        const old=film;
+        film=v; old.removeAttribute('id'); v.id='frames'; v.style.visibility=''; v.addEventListener('seeked',onSeeked);
+        seeking=false; atF=pendF=f; setReach(n-1,n);
+        requestAnimationFrame(()=>{old.pause();old.removeAttribute('src');old.load();old.remove()});
+        showFrame(shown);
+      },{once:true});
+      v.currentTime=(f+.5)/fps;
+    };
+    const pl=v.play();
+    if(pl&&pl.then)pl.then(ready,ready); else ready();
+  },{once:true});
+  v.src=URL.createObjectURL(b);
+  v.load();
+}
+function loadFilm(){
+  const c=navigator.connection, light=c&&(c.saveData||/2g/.test(c.effectiveType||''));
+  const first=!PHONE&&window.MediaSource&&MediaSource.isTypeSupported(FAST_MIME)?streamFast().catch(()=>{film.removeAttribute('src');film.load();return wholeFast()}):wholeFast();
+  first.then(()=>{if(!light)return getBlob(FILMS.hd[0]).then(swapIn)}).catch(()=>{ring.style.opacity=0});
 }
 function updateCaptions(p){
   bands.forEach(b=>{
@@ -370,7 +402,8 @@ function tick(now){
   if(Math.abs(target-shown)<.0005){shown=target;rafId=null;lastTick=0}
   else rafId=requestAnimationFrame(tick);
   updateCaptions(shown);
-  drawScenes(shown);
+  drawFx(shown);
+  showFrame(shown);
 }
 function onScroll(){
   target=Math.min(heroProgress(),reach);
@@ -380,7 +413,8 @@ new IntersectionObserver(e=>{heroOnScreen=e[0].isIntersecting;if(heroOnScreen)on
 
 function initHeroOnce(){
   if(heroInit)return; heroInit=true;
-  loadScenes();
+  /* the film starts downloading straight away, it is what the visitor sees first */
+  loadFilm();
 }
 const GATES=[
   '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',

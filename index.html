@@ -15,7 +15,7 @@
 <link rel="preload" href="assets/fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="assets/hero-poster.webp" imagesrcset="assets/hero-poster-1100.webp 1100w, assets/hero-poster.webp 1728w" imagesizes="(orientation:portrait) 420px, 100vw" fetchpriority="high">
-<link rel="stylesheet" href="assets/site.css?v=20261102k">
+<link rel="stylesheet" href="assets/site.css?v=20261102l">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -182,7 +182,7 @@
   </div>
 </main>
 
-<script src="assets/featured.js?v=20261102k" defer></script>
+<script src="assets/featured.js?v=20261102l" defer></script>
 
 <script>
 (function(){
@@ -219,7 +219,8 @@ const NV=241, FPS=30, SRC=PHONE?'assets/walk-phone.mp4':'assets/walk-hd.mp4';
 const PAN=[339,339,339,340.4,348.3,362.7,383,408.6,438.8,473,510.5,550.7,593,636.6,681,725.5,769.5,812.4,853.5,892.2,927.8,959.6,987.2,1009.7,1026.4,1037.1,1040.7,1040.6,1040.4,1040.1,1039.8,1039.7,1039.3,1039.2,1038.9,1038.6,1038.3,1038,1037.6,1037.2,1036.8,1036.3,1035.9,1035.4,1035,1034.4,1033.8,1033.2,1032.3,1031.6,1030.7,1029.9,1029.2,1028.7,1028.4,1028.4,1028.2,1028.2,1028.2,1028.2,1028.1,1027.9,1027.7,1026.9,1025.8,1024.5,1022.8,1021.1,1019.1,1017.3,1015.7,1014,1012.2,1010.4,1008.3,1006.1,1003.5,1000.7,997.7,994.3,990.8,987,982.9,978.9,974.7,970.5,965.8,960.8,955.1,948.6,941.2,933.4,925.8,919.1,913.3,909.3,906.4,904.8,903.8,903.3,903.2,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903,903];
 const panAt=p=>{const x=p*(PAN.length-1), a=Math.min(PAN.length-2,Math.floor(x));return PAN[a]+(PAN[a+1]-PAN[a])*(x-a)};
 const panPct=ox=>{const sw=1080*innerWidth/innerHeight;return clamp(clamp(ox-sw/2,0,1440-sw)/(1920-sw)*100,0,100)};
-const stage=$('#stage'), hero=$('.hero'), ring=$('#ring'), posterLayer=$('#poster'), cue=$('#cue'), film=$('#frames');
+const stage=$('#stage'), hero=$('.hero'), ring=$('#ring'), posterLayer=$('#poster'), cue=$('#cue');
+let film=$('#frames');
 const bands=$$('.band').map((el,i,all)=>({el,a:+el.dataset.a,b:+el.dataset.b,first:i===0,last:i===all.length-1,op:-1,k:-1}));
 let target=0,shown=0,rafId=null,lastTick=0,heroOnScreen=true,scrubOn=false,heroInit=false;
 let lastOx=-1,lastRise=-1,lastCue=null,lastSign=null;
@@ -250,6 +251,7 @@ function updateRise(){
    Made for scrubbing: a full picture every four frames and no reordered frames, so any moment is a few
    milliseconds away. Every step is full quality and nothing piles up in memory.
    Computers play it while it downloads: the same film, packed in small pieces, fed to the player as they arrive.
+   Phones first get a short opening cut from the same film, then the whole film takes over at the same frame.
    Until the end has arrived, the walk (picture and words together) goes only as far as the film has. */
 let filmReady=false, seeking=false, wantF=-1, atF=-1, pendF=-1, reach=1, maxF=NV-1;
 film.muted=true; film.playsInline=true;
@@ -259,11 +261,13 @@ function showFrame(p){
   /* one jump at a time, always to the latest spot */
   if(!seeking&&wantF!==atF){seeking=true;pendF=wantF;film.currentTime=(wantF+.5)/FPS}
 }
-film.addEventListener('seeked',()=>{
+function onSeeked(e){
+  if(e.target!==film)return;
   seeking=false; atF=pendF;
   if(!stage.classList.contains('video-ready')){stage.classList.add('video-ready');setTimeout(()=>{posterLayer.style.visibility='hidden'},700)}
   if(wantF!==atF)showFrame(wantF/(NV-1));
-});
+}
+film.addEventListener('seeked',onSeeked);
 function filmShown(){
   ring.style.opacity=0;
   /* some phones only paint a paused video after it has played once */
@@ -319,11 +323,12 @@ function loadFilm(){
   const c=navigator.connection;
   if(c&&(c.saveData||/2g/.test(c.effectiveType||''))){ring.style.opacity=0;return}   /* very slow connections keep the still picture */
   if(!PHONE&&window.MediaSource&&MediaSource.isTypeSupported(MIME)){streamFilm();return}
+  if(PHONE){phoneFilm();return}
   wholeFilm();
 }
-/* phones (and any browser that cannot take pieces): the whole film first, then the walk */
-function wholeFilm(){
-  fetch(SRC).then(r=>{
+/* a whole file, with the loading ring following it */
+function getBlob(url){
+  return fetch(url).then(r=>{
     if(!r.ok)throw 0;
     const total=+r.headers.get('content-length')||0;
     if(!r.body||!total)return r.blob();
@@ -335,11 +340,54 @@ function wholeFilm(){
       return read();
     });
     return read();
-  }).then(b=>{
+  });
+}
+/* any browser that cannot take pieces: the whole film first, then the walk */
+function wholeFilm(){
+  getBlob(SRC).then(b=>{
     film.addEventListener('loadeddata',filmShown,{once:true});
     film.src=URL.createObjectURL(b);
     film.load();
   }).catch(()=>{ring.style.opacity=0});
+}
+/* phones: the opening (the film's first 48 frames, cut out without re-encoding) arrives in a couple of seconds and the walk starts;
+   the whole film keeps downloading and then takes over at the same frame, after which everything is exactly the whole film */
+const START='assets/walk-phone-start.mp4', START_F=48;
+function phoneFilm(){
+  reach=(START_F-1)/(NV-1); maxF=START_F-1;
+  getBlob(START).then(b=>{
+    film.addEventListener('loadeddata',filmShown,{once:true});
+    film.src=URL.createObjectURL(b);
+    film.load();
+    getBlob(SRC).then(swapIn).catch(()=>{});
+  },()=>{reach=1;maxF=NV-1;wholeFilm()});
+}
+function swapIn(b){
+  const v=document.createElement('video');
+  v.className='frames'; v.muted=true; v.playsInline=true;
+  v.setAttribute('muted',''); v.setAttribute('playsinline',''); v.setAttribute('disablepictureinpicture',''); v.setAttribute('aria-hidden','true');
+  v.style.visibility='hidden';
+  film.after(v);
+  v.addEventListener('loadeddata',()=>{
+    const ready=()=>{
+      v.pause();
+      const f=Math.max(0,atF);
+      v.addEventListener('seeked',()=>{
+        /* the whole film now shows the same frame: it replaces the opening in one step */
+        const old=film;
+        film=v; old.removeAttribute('id'); v.id='frames'; v.style.visibility=''; v.addEventListener('seeked',onSeeked);
+        seeking=false; atF=pendF=f; reach=1; maxF=NV-1;
+        requestAnimationFrame(()=>{old.pause();old.removeAttribute('src');old.load();old.remove()});
+        if(scrubOn)onScroll();
+        showFrame(shown);
+      },{once:true});
+      v.currentTime=(f+.5)/FPS;
+    };
+    const pl=v.play();
+    if(pl&&pl.then)pl.then(ready,ready); else ready();
+  },{once:true});
+  v.src=URL.createObjectURL(b);
+  v.load();
 }
 function updateCaptions(p){
   bands.forEach(b=>{

@@ -15,7 +15,7 @@
 <link rel="preload" href="assets/fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="assets/hero-poster.webp" imagesrcset="assets/hero-poster-1100.webp 1100w, assets/hero-poster.webp 1728w" imagesizes="(orientation:portrait) 420px, 100vw" fetchpriority="high">
-<link rel="stylesheet" href="assets/site.css?v=20261102g">
+<link rel="stylesheet" href="assets/site.css?v=20261102h">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -182,7 +182,7 @@
   </div>
 </main>
 
-<script src="assets/featured.js?v=20261102g" defer></script>
+<script src="assets/featured.js?v=20261102h" defer></script>
 
 <script>
 (function(){
@@ -250,7 +250,7 @@ function updateRise(){
    Every picture is downloaded once and kept compressed. Only the few around the current spot are decoded,
    in a background thread, so full-HD pictures never fill the memory or block scrolling. */
 const frames=new Array(FRAMES), have=new Uint8Array(FRAMES), decoding=new Set(), blobs=[];
-const WIN=PHONE?6:8;   /* decoded pictures kept on each side of the current one */
+const WIN=PHONE?10:8, BUSY=3;   /* decoded pictures kept on each side of the current one, and how many are prepared at once */
 let ctx=null,drawnKey='',framesReady=false,center=0,dir=1,worker=null,fetchList=[],fetchNext=0,fetched=0;
 const frameUrl=i=>FRAME_DIR+'f'+String(i+1).padStart(3,'0')+'.webp';
 function sizeCanvas(){
@@ -298,10 +298,10 @@ function drawFrame(p){
 }
 function fillWindow(){
   for(let i=0;i<FRAMES;i++)if(frames[i]&&Math.abs(i-center)>WIN+2){if(frames[i].close)frames[i].close();frames[i]=undefined}
-  /* the closest missing pictures first, the ones ahead before the ones behind, two at a time */
-  for(let d=0;d<=WIN&&decoding.size<2;d++){
+  /* the closest missing pictures first, the ones ahead before the ones behind, a few at a time */
+  for(let d=0;d<=WIN&&decoding.size<BUSY;d++){
     for(const i of d?[center+dir*d,center-dir*d]:[center]){
-      if(i<0||i>=FRAMES||frames[i]||!have[i]||decoding.has(i)||decoding.size>=2)continue;
+      if(i<0||i>=FRAMES||frames[i]||!have[i]||decoding.has(i)||decoding.size>=BUSY)continue;
       decoding.add(i); decodeOne(i);
     }
   }

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin | Milcar</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<!-- only this site, the Supabase library's CDN and this Supabase project may run or load anything here (if the project ever changes, change its address here too) -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' https://nlhjnihjvlhimmigofbx.supabase.co; img-src 'self' data: blob: https://nlhjnihjvlhimmigofbx.supabase.co; style-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="theme-color" content="#0B0D14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23111218'/%3E%3Cpath d='M6 24 11 8h4l2 9 6-9h4l-5 16h-4l3-9-6 9h-2l-2-9-3 9z' fill='%23EFEDF4'/%3E%3Cpath d='M4 28h24' stroke='%23E3262E' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css?v=20261102q">
+<link rel="stylesheet" href="assets/admin.css?v=20261102a">
+</head>
+<body class="admin">
+<a class="skip" href="#main">Skip to content</a>
+<div class="env" aria-hidden="true"></div>
+
+<nav class="nav solid" aria-label="Admin">
+  <a class="wordmark" href="admin.html">Milcar<small>Showroom admin</small></a>
+  <ul>
+    <li><a href="inventory.html" target="_blank" rel="noopener">View site</a></li>
+    <li class="when-in" hidden><button class="btn ghost" type="button" id="logout">Log out</button></li>
+  </ul>
+</nav>
+
+<main id="main" tabindex="-1">
+
+  <!-- shown while the page checks for a saved login -->
+  <section class="a-view a-wait" id="wait"><p class="label">One moment</p></section>
+
+  <!-- the Supabase library could not load, or the config holds the wrong key -->
+  <section class="a-view a-narrow" id="offline" hidden>
+    <p class="label">Admin</p>
+    <h1>Can’t reach the showroom database</h1>
+    <p class="a-lead">Check your internet connection, then reload this page.</p>
+    <button class="btn" type="button" data-reload>Reload</button>
+  </section>
+
+  <!-- log in -->
+  <section class="a-view a-narrow" id="login" hidden>
+    <p class="label">Showroom admin</p>
+    <h1>Log in</h1>
+    <p class="a-lead">Use the email and password of your Supabase admin user.</p>
+    <form id="loginForm" novalidate>
+      <label><span>Email</span><input type="email" name="email" autocomplete="username" inputmode="email" required></label>
+      <label><span>Password</span><input type="password" name="password" autocomplete="current-password" required></label>
+      <p class="a-error" id="loginError" role="alert" hidden></p>
+      <button class="btn" type="submit">Log in</button>
+    </form>
+  </section>
+
+  <!-- logged in, but not on the admin list -->
+  <section class="a-view a-narrow" id="notAdmin" hidden>
+    <p class="label">Showroom admin</p>
+    <h1>This login can’t edit cars</h1>
+    <p class="a-lead">You’re logged in as <b id="notAdminEmail"></b>, but that email isn’t on the admin list. Add it with part 6 of <code>supabase/setup.sql</code>, then log in again.</p>
+    <button class="btn ghost" type="button" data-logout>Log out</button>
+  </section>
+
+  <!-- the list of cars -->
+  <section class="a-view" id="list" hidden>
+    <header class="a-head">
+      <div>
+        <p class="label">Showroom admin</p>
+        <h1>Cars</h1>
+      </div>
+      <a class="btn" href="#new">Add a car</a>
+    </header>
+    <div class="a-tools">
+      <label class="a-search"><span class="label">Search</span><input type="search" id="search" placeholder="Make, model, year, colour…" autocomplete="off"></label>
+      <div class="filters a-filters" id="statusFilter" role="group" aria-label="Show cars that are">
+        <button type="button" data-status="all" aria-pressed="true">All <i></i></button>
+        <button type="button" data-status="available" aria-pressed="false">Available <i></i></button>
+        <button type="button" data-status="reserved" aria-pressed="false">Reserved <i></i></button>
+        <button type="button" data-status="sold" aria-pressed="false">Sold <i></i></button>
+      </div>
+    </div>
+    <p class="a-hint">Sold cars stay here but are hidden from the website. Reserved cars show a “Reserved” tag.</p>
+    <ul class="a-cars" id="cars"></ul>
+    <p class="a-empty" id="empty" hidden>No cars match.</p>
+  </section>
+
+  <!-- add or edit one car -->
+  <section class="a-view" id="edit" hidden>
+    <form id="carForm" novalidate>
+      <header class="a-head">
+        <div>
+          <a class="crumb" href="#list">All cars</a>
+          <p class="label" id="editLabel">Edit car</p>
+          <h1 id="editTitle">New car</h1>
+        </div>
+      </header>
+
+      <fieldset class="a-card">
+        <legend>The car</legend>
+        <div class="a-grid">
+          <label><span>Make</span><input name="make" required placeholder="Ferrari" autocomplete="off"></label>
+          <label><span>Model</span><input name="model" required placeholder="F8 Tributo" autocomplete="off"></label>
+          <label><span>Type</span>
+            <select name="type" required>
+              <option>Supercars</option><option>Sports cars</option><option>SUVs</option>
+            </select>
+          </label>
+          <label><span>Web address name</span><input name="id" required pattern="[a-z0-9]+(-[a-z0-9]+)*" autocomplete="off" spellcheck="false" autocapitalize="off">
+            <small id="idHint">Made from the make and model. Only lowercase letters, numbers and dashes.</small></label>
+          <label class="a-wide"><span>Tagline</span><input name="tagline" placeholder="Twin turbos, driven from the rear." autocomplete="off"></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="a-card">
+        <legend>Status and price</legend>
+        <div class="a-status a-status-form" role="group" aria-label="Status" id="statusPick">
+          <button type="button" data-status="available" aria-pressed="true">Available</button>
+          <button type="button" data-status="reserved" aria-pressed="false">Reserved</button>
+          <button type="button" data-status="sold" aria-pressed="false">Sold</button>
+        </div>
+        <div class="a-grid">
+          <label><span>Price in US dollars</span><input name="price" inputmode="numeric" placeholder="Empty shows “Price on request”" autocomplete="off">
+            <small id="priceShow"></small></label>
+          <label><span>Position in the list</span><input name="sort_order" type="number" inputmode="numeric" step="1">
+            <small>Lower numbers come first.</small></label>
+          <label class="a-check a-wide"><input type="checkbox" name="sample"><span>Show the “Sample” tag (for example listings, not real stock)</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="a-card">
+        <legend>Photos</legend>
+        <p class="a-hint">The first photo is the main one. Phone photos are made smaller before upload, so they load fast on the website.</p>
+        <ol class="a-photos" id="photos"></ol>
+        <label class="btn ghost a-upload"><input type="file" id="photoInput" accept="image/*" multiple>Add photos</label>
+        <label class="a-wide"><span>Photo credit</span><input name="credit" placeholder="Who took the photos (optional)" autocomplete="off"></label>
+      </fieldset>
+
+      <fieldset class="a-card">
+        <legend>Factory specs</legend>
+        <p class="a-hint">Shown in this order on the car’s page. A spec without a value is left out.</p>
+        <ol class="a-specs" id="specs"></ol>
+        <button class="btn ghost a-small" type="button" id="addSpec">Add a spec</button>
+      </fieldset>
+
+      <fieldset class="a-card">
+        <legend>This car</legend>
+        <p class="a-hint">The exact car on the floor. Anything left empty shows “On request”.</p>
+        <div class="a-grid">
+          <label><span>Year</span><input name="year" type="number" inputmode="numeric" min="1900" max="2100" step="1"></label>
+          <label><span>Mileage in km</span><input name="mileage_km" inputmode="numeric" autocomplete="off"></label>
+          <label><span>Colour</span><input name="color" autocomplete="off"></label>
+          <label><span>Previous owners</span><input name="previous_owners" type="number" inputmode="numeric" min="0" step="1"></label>
+          <label><span>Service records</span><input name="service_records" placeholder="Full dealer history" autocomplete="off"></label>
+          <label><span>Import papers</span><input name="import_papers" placeholder="Customs cleared" autocomplete="off"></label>
+        </div>
+      </fieldset>
+
+      <div class="a-danger" id="dangerZone">
+        <button class="a-delete" type="button" id="deleteCar">Delete this car</button>
+      </div>
+
+      <div class="a-bar">
+        <p class="a-error" id="formError" role="alert" hidden></p>
+        <a class="btn ghost" href="#list" id="cancelEdit">Cancel</a>
+        <button class="btn" type="submit" id="saveCar">Save</button>
+      </div>
+    </form>
+  </section>
+</main>
+
+<dialog class="a-dialog" id="confirmDelete" aria-labelledby="confirmTitle">
+  <form method="dialog">
+    <p class="label">Delete</p>
+    <h2 id="confirmTitle">Delete this car?</h2>
+    <p id="confirmText">It disappears from the website and its uploaded photos are deleted. This can’t be undone.</p>
+    <div class="a-dialog-actions">
+      <button class="btn ghost" value="keep" autofocus>Keep it</button>
+      <button class="btn a-btn-danger" value="delete">Delete</button>
+    </div>
+  </form>
+</dialog>
+
+<p class="a-toast" id="toast" role="status" aria-live="polite"></p>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" crossorigin="anonymous"></script>
+<script src="assets/supabase-config.js?v=20261102a"></script>
+<script src="assets/admin.js?v=20261102a"></script>
+</body>
+</html>

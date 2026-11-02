@@ -1,0 +1,22 @@
+# Never upload secrets. The Supabase publishable key in assets/supabase-config.js is meant to be
+# public; the secret / service_role key, passwords and private keys must never be in this folder.
+.env
+.env.*
+*.local
+*.key
+*.pem
+secrets*
+service-role*
+
+# Supabase command-line and Netlify working files, if they are ever used here
+supabase/.temp/
+supabase/.branches/
+.netlify/
+
+# computer and editor clutter
+node_modules/
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+*.log

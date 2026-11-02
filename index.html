@@ -15,7 +15,7 @@
 <link rel="preload" href="assets/fonts/marcellus.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" as="image" href="assets/hero-poster.webp" imagesrcset="assets/hero-poster-1100.webp 1100w, assets/hero-poster.webp 1728w" imagesizes="(orientation:portrait) 420px, 100vw" fetchpriority="high">
-<link rel="stylesheet" href="assets/site.css?v=20261102j">
+<link rel="stylesheet" href="assets/site.css?v=20261102k">
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
@@ -182,7 +182,7 @@
   </div>
 </main>
 
-<script src="assets/featured.js?v=20261102j" defer></script>
+<script src="assets/featured.js?v=20261102k" defer></script>
 
 <script>
 (function(){
@@ -248,12 +248,14 @@ function updateRise(){
 }
 /* ---------- the walk-in film ----------
    Made for scrubbing: a full picture every four frames and no reordered frames, so any moment is a few
-   milliseconds away. It is downloaded whole first, then every step is full quality and nothing piles up in memory. */
-let filmReady=false, seeking=false, wantF=-1, atF=-1, pendF=-1;
+   milliseconds away. Every step is full quality and nothing piles up in memory.
+   Computers play it while it downloads: the same film, packed in small pieces, fed to the player as they arrive.
+   Until the end has arrived, the walk (picture and words together) goes only as far as the film has. */
+let filmReady=false, seeking=false, wantF=-1, atF=-1, pendF=-1, reach=1, maxF=NV-1;
 film.muted=true; film.playsInline=true;
 function showFrame(p){
   if(!filmReady)return;
-  wantF=Math.round(clamp(p,0,1)*(NV-1));
+  wantF=Math.min(maxF,Math.round(clamp(p,0,1)*(NV-1)));
   /* one jump at a time, always to the latest spot */
   if(!seeking&&wantF!==atF){seeking=true;pendF=wantF;film.currentTime=(wantF+.5)/FPS}
 }
@@ -262,9 +264,65 @@ film.addEventListener('seeked',()=>{
   if(!stage.classList.contains('video-ready')){stage.classList.add('video-ready');setTimeout(()=>{posterLayer.style.visibility='hidden'},700)}
   if(wantF!==atF)showFrame(wantF/(NV-1));
 });
+function filmShown(){
+  ring.style.opacity=0;
+  /* some phones only paint a paused video after it has played once */
+  const go=()=>{film.pause();filmReady=true;atF=-1;showFrame(Math.min(shown,reach))};
+  const pl=film.play();
+  if(pl&&pl.then)pl.then(go,go); else go();
+}
+const STREAM='assets/walk-hd-stream.mp4', MIME='video/mp4; codecs="avc1.640028"';
+function streamFilm(){
+  const ms=new MediaSource(); let sb=null, queue=[], ended=false, failed=false, total=0, got=0;
+  const fail=()=>{if(failed)return;failed=true;reach=1;maxF=NV-1;film.removeAttribute('src');film.load();wholeFilm()};
+  /* how far the arrived pieces reach */
+  const grow=()=>{
+    if(!sb||!sb.buffered.length)return;
+    const f=ended&&!queue.length?NV-1:Math.min(NV-1,Math.floor(sb.buffered.end(sb.buffered.length-1)*FPS+1e-6)-1);
+    if(f>maxF||reach<1&&f===NV-1){maxF=Math.max(0,f);reach=maxF/(NV-1);if(scrubOn)onScroll()}
+  };
+  const feed=()=>{
+    if(!sb||sb.updating||failed)return;
+    if(queue.length){
+      const n=queue.reduce((a,c)=>a+c.length,0), buf=new Uint8Array(n); let o=0;
+      for(const c of queue){buf.set(c,o);o+=c.length}
+      queue=[];
+      try{sb.appendBuffer(buf)}catch(e){fail()}
+    }else if(ended&&ms.readyState==='open'){try{ms.endOfStream()}catch(e){}grow()}
+  };
+  reach=0; maxF=0;
+  film.addEventListener('loadeddata',filmShown,{once:true});
+  film.addEventListener('error',fail,{once:true});
+  ms.addEventListener('sourceopen',()=>{
+    try{sb=ms.addSourceBuffer(MIME)}catch(e){fail();return}
+    let first=true;
+    sb.addEventListener('updateend',()=>{
+      if(first){first=false;try{ms.duration=NV/FPS}catch(e){}}
+      grow();feed();
+    });
+    fetch(STREAM,{priority:'high'}).then(r=>{
+      if(!r.ok||!r.body)throw 0;
+      total=+r.headers.get('content-length')||0;
+      const rd=r.body.getReader();
+      const read=()=>rd.read().then(({done,value})=>{
+        if(done){ended=true;feed();return}
+        queue.push(value); got+=value.length;
+        if(total)ring.style.setProperty('--ld',Math.round(126*(1-got/total)));
+        feed(); return read();
+      });
+      return read();
+    }).catch(fail);
+  },{once:true});
+  film.src=URL.createObjectURL(ms);
+}
 function loadFilm(){
   const c=navigator.connection;
   if(c&&(c.saveData||/2g/.test(c.effectiveType||''))){ring.style.opacity=0;return}   /* very slow connections keep the still picture */
+  if(!PHONE&&window.MediaSource&&MediaSource.isTypeSupported(MIME)){streamFilm();return}
+  wholeFilm();
+}
+/* phones (and any browser that cannot take pieces): the whole film first, then the walk */
+function wholeFilm(){
   fetch(SRC).then(r=>{
     if(!r.ok)throw 0;
     const total=+r.headers.get('content-length')||0;
@@ -278,13 +336,7 @@ function loadFilm(){
     });
     return read();
   }).then(b=>{
-    film.addEventListener('loadeddata',()=>{
-      ring.style.opacity=0;
-      /* some phones only paint a paused video after it has played once */
-      const go=()=>{film.pause();filmReady=true;atF=-1;showFrame(shown)};
-      const pl=film.play();
-      if(pl&&pl.then)pl.then(go,go); else go();
-    },{once:true});
+    film.addEventListener('loadeddata',filmShown,{once:true});
     film.src=URL.createObjectURL(b);
     film.load();
   }).catch(()=>{ring.style.opacity=0});
@@ -321,17 +373,15 @@ function tick(now){
   showFrame(shown);
 }
 function onScroll(){
-  target=heroProgress();
+  target=Math.min(heroProgress(),reach);
   if(rafId===null&&heroOnScreen&&scrubOn)rafId=requestAnimationFrame(tick);
 }
 new IntersectionObserver(e=>{heroOnScreen=e[0].isIntersecting;if(heroOnScreen)onScroll()}).observe(stage);
 
 function initHeroOnce(){
   if(heroInit)return; heroInit=true;
-  /* the heavy part waits until the page has painted and settled */
-  const start=loadFilm;
-  const later=()=>'requestIdleCallback' in window?requestIdleCallback(start,{timeout:1500}):setTimeout(start,300);
-  if(document.readyState==='complete')later(); else addEventListener('load',later,{once:true});
+  /* the film starts downloading straight away, it is what the visitor sees first */
+  loadFilm();
 }
 const GATES=[
   '(orientation: landscape) and (pointer: coarse) and (max-height: 560px)',

@@ -36,11 +36,11 @@ All are under the [Unsplash License](https://unsplash.com/license): free for com
 | `assets/cars/int-ferrari*` | Franco Debartolo | https://unsplash.com/photos/8yKt-ZPhdUk |
 
 ## AI-generated
-Made with fal (Kling 4, Nano Banana Pro) for this site.
+Made with fal (Kling 4, Nano Banana Pro, Topaz upscaling) for this site.
 
 | Site files | Notes |
 |---|---|
-| `assets/walk-hd.mp4`, `assets/walk-phone.mp4`, `assets/hero-ending*` | Walk-in video, started from the owner's photo |
+| `assets/walk/*`, `assets/hero-ending*` | Walk-in: four stills from the walk-in video (started from the owner's photo), upscaled with Topaz on fal |
 | `assets/build-scrub*`, `assets/stage-*`, `assets/color-*`, `assets/step-3*` | Hold-to-build car, unbadged, labeled as illustration only |
 
 ## Fonts

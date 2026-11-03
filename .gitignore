@@ -20,7 +20,3 @@ Thumbs.db
 desktop.ini
 .vscode/
 *.log
-
-# the build's output (GitHub Actions makes it fresh on every upload)
-dist/
-dist-ssr/

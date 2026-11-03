@@ -1,7 +1,6 @@
-/* Milcar: the whole look of the site, one global stylesheet (colours, type, spacing and animations). */
-@font-face{font-family:'Marcellus';src:url(../assets/fonts/marcellus.woff2) format('woff2');font-display:swap}
-@font-face{font-family:'Jost';src:url(../assets/fonts/jost.woff2) format('woff2');font-weight:300 500;font-display:swap}
-@font-face{font-family:'Mrs Saint Delafield';src:url(../assets/fonts/mrs-saint-delafield.woff2) format('woff2');font-display:swap}
+@font-face{font-family:'Marcellus';src:url(fonts/marcellus.woff2) format('woff2');font-display:swap}
+@font-face{font-family:'Jost';src:url(fonts/jost.woff2) format('woff2');font-weight:300 500;font-display:swap}
+@font-face{font-family:'Mrs Saint Delafield';src:url(fonts/mrs-saint-delafield.woff2) format('woff2');font-display:swap}
 :root{
   --section:clamp(84px,12vh,150px);
   --canvas:#0B0D14;--panel:#141722;--panel-2:#1B1F2C;
@@ -120,7 +119,7 @@ h2{font-size:clamp(40px,6vw,88px)}
   .stage{display:none}
   .below{margin-top:0!important;border-radius:0!important;box-shadow:none!important}
   .static-hero{display:block;padding-top:68px}
-  .static-photo{aspect-ratio:16/9;max-height:62vh;width:100%;background:url(../assets/hero-poster.jpg) center/cover no-repeat}
+  .static-photo{aspect-ratio:16/9;max-height:62vh;width:100%;background:url(hero-poster.jpg) center/cover no-repeat}
   .static-copy{padding:28px var(--gutter) 44px}
   .static-copy h1{font-size:clamp(44px,8vw,86px);margin-bottom:16px}
   .static-copy p{color:var(--text-secondary);max-width:44ch;margin-bottom:24px}
@@ -224,9 +223,6 @@ section{scroll-margin-top:76px}
 .tag.reserved{left:auto;right:14px;background:var(--metal);color:#14120D;font-weight:500}
 /* while the cars arrive, and if they can't */
 .loading{grid-column:1/-1;min-height:40vh;animation:rise .6s .4s var(--ease) both}
-/* while the cars arrive, the page keeps their room, so nothing on screen jumps when they appear */
-.grid .loading,.car-page .loading{min-height:100vh;min-height:100svh}
-.filters:empty{min-height:68px}
 .inv-empty{grid-column:1/-1;color:var(--text-secondary)}
 .offline-note{grid-column:1/-1;max-width:600px;padding:clamp(28px,5vw,46px);border-radius:24px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);animation:rise .7s var(--ease) both}
 .offline-note h2{margin:8px 0 12px;font-size:clamp(32px,4vw,50px)}

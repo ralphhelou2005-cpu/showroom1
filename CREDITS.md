@@ -1,5 +1,7 @@
 # Image and font credits
 
+The pictures and fonts are in `src/assets/` and the videos in `public/assets/`; the `assets/...` paths below are inside those folders.
+
 ## Owner's photo
 | File | Source |
 |---|---|

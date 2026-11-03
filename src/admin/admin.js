@@ -1,5 +1,9 @@
 /* The showroom admin: log in, see every car, add and edit cars, upload photos.
    It talks to Supabase directly; the database rules in supabase/setup.sql decide what this login may do. */
+import { createClient } from '@supabase/supabase-js';
+import { SUPABASE_ANON_KEY, SUPABASE_KEY_OK, SUPABASE_URL } from '../config';
+import { asset } from '../data/images';
+
 (() => {
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
@@ -12,7 +16,8 @@ const named = (e, text) => { e.textContent = ''; text.split(/(\d+)/).forEach((pa
 const money = n => n == null ? 'Price on request' : '$' + Number(n).toLocaleString('en-US');
 /* every photo has a smaller copy beside it for lists and phones: svj.webp and svj-800.webp */
 const small = src => src.replace(/\.(webp|jpe?g|png|avif)$/i, '-800.$1');
-const pic = (src, alt) => { const img = el('img'); img.alt = alt; img.decoding = 'async'; img.src = small(src); img.onerror = () => { img.onerror = null; img.src = src; }; return img; };
+/* site photos are found through the build's picture list; uploaded photos are full web addresses */
+const pic = (src, alt) => { const img = el('img'); img.alt = alt; img.decoding = 'async'; img.src = asset(small(src)); img.onerror = () => { img.onerror = null; img.src = asset(src); }; return img; };
 
 const views = ['wait', 'offline', 'login', 'notAdmin', 'list', 'edit'];
 function show(id) {
@@ -45,10 +50,10 @@ const iconBtn = (sym, label, fn, off) => {
 };
 $$('[data-reload]').forEach(b => b.addEventListener('click', () => location.reload()));
 
-/* no library or the wrong kind of key: say so instead of a blank page */
-if (!window.supabase || typeof SUPABASE_URL === 'undefined' || !SUPABASE_KEY_OK) { show('offline'); return; }
+/* the wrong kind of key: say so instead of a blank page */
+if (!SUPABASE_KEY_OK) { show('offline'); return; }
 /* the login is kept under its own name, so the public pages never read it */
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'milcar-admin' } });
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false, storageKey: 'milcar-admin' } });
 const PUBLIC = SUPABASE_URL + '/storage/v1/object/public/' + BUCKET + '/';
 
 let me = null, cars = [], filter = 'all', editing = null;
@@ -207,7 +212,7 @@ function openEdit(c) {
   F.type.value = car.type;
   F.sample.checked = !!car.sample;
   F.id.readOnly = !isNew;
-  $('#idHint').textContent = isNew ? 'Made from the make and model. Only lowercase letters, numbers and dashes.' : 'The car’s page is car.html?id=' + c.id + '. It can’t change once the car is added.';
+  $('#idHint').textContent = isNew ? 'Made from the make and model. Only lowercase letters, numbers and dashes.' : 'The car’s page is /car/' + c.id + '. It can’t change once the car is added.';
   $('#editLabel').textContent = isNew ? 'Add a car' : 'Edit car';
   named($('#editTitle'), isNew ? 'New car' : NAME(c));
   $('#dangerZone').hidden = isNew;

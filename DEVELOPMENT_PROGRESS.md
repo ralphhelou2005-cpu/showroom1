@@ -40,20 +40,27 @@ The live website (`main`, GitHub Pages) does not change until Phase 10, and only
 **Checked**: 32 browser checks at 375 and 1440 px (languages, direction, fonts, spacing, redirects, headers,
 dashboard door, no errors).
 
+**Applied to the live Supabase project (2026-11-04)**, at the owner's choice instead of a staging project:
+backup snapshot first, the nine files one at a time, then a tenth (indexes on the remaining foreign keys, from
+Supabase's performance advisor). Checked afterwards: the current site's 7 cars byte-for-byte unchanged and its
+rules intact; the owner's login is OWNER; 7 vehicles, 6 brands, 13 photos, 42 spec lines, all matching the
+originals; row level security on all 20 tables; 18 checks through the public API as a visitor (public data
+readable, everything private refused, no free viewing times until hours are entered); the live website's full
+test on computer and phone. Database types generated into `src/types/database.ts` and used by all four
+Supabase connections. Advisor notes in docs/DATABASE.md.
+
 **Not done yet / carried forward**
-- Nothing is applied to any Supabase project yet. Next: a free staging project (the owner creates it), then
-  the migrations there. Production only at the switch, after a backup.
 - The home page is a temporary "foundation" page; Phase 3 replaces it with the showroom.
-- Database types for TypeScript are generated from the staging project once it exists.
+- With no staging copy, anything that writes data is tested on the in-memory database, never the live one.
 - Arabic typeface, and mirroring of the existing sections for right to left: Phase 8.
-- Full Content-Security-Policy: Phase 9.
+- Full Content-Security-Policy, and splitting the seven combined staff read/write rules (Supabase advisor): Phase 9.
 
 ## Decisions waiting for the owner
 
 | # | Decision | Needed by |
 |---|---|---|
 | 1 | Vercel Pro (about $20/month; the free plan forbids commercial use) or a free alternative | Phase 3 |
-| 2 | A free staging Supabase project now; Supabase Pro (about $25/month) for production before launch | Phase 3 / launch |
+| 2 | ~~A staging project~~ (owner chose the existing project, 2026-11-04). Supabase Pro (about $25/month) for daily backups before launch | Launch |
 | 3 | The domain | Phase 7 |
 | 4 | Resend and Cloudflare accounts (free tiers) | Phase 7 / 9 |
 | 5 | Business details: address, map, hours, phone, WhatsApp, email, booking rules, staff, brands, About facts | Phase 3 |

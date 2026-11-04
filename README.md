@@ -43,11 +43,12 @@ npm run dev                  # http://localhost:3000
 |---|---|
 | `src/app/` | Pages and server endpoints (Next.js App Router). `[locale]/` is the public site in each language |
 | `src/i18n/` | The languages: routing, loading the words, links that keep the language |
-| `src/lib/supabase/` | The three ways to reach Supabase: `public` (visitors' view, cacheable), `server` and `browser` (as the logged-in member of staff, so their rules apply), `admin` (the server's own key, server only) |
+| `src/lib/supabase/` | The ways to reach Supabase: `public` (visitors' view, cacheable), `server` and `browser` (as the logged-in member of staff, so their rules apply), `admin` (the server's own key, server only) |
 | `src/lib/env.ts`, `env.server.ts` | Settings, checked at start-up. Secrets are in `env.server.ts`, which browser code cannot import |
 | `src/proxy.ts` | Runs before each page: the language, and the dashboard's login check |
 | `src/components/`, `src/lib/home.ts`, `src/lib/build.ts`, `src/assets/` | The current site's sections, walk-in and hold-to-build, and pictures, moving into the platform in Phase 3 |
-| `supabase/migrations/` | The database, in nine files. See [docs/DATABASE.md](docs/DATABASE.md) |
+| `supabase/migrations/` | The database, in ten files, applied to the live project on 2026-11-04. See [docs/DATABASE.md](docs/DATABASE.md) |
+| `src/types/database.ts` | TypeScript types for every table, generated from the live database (regenerate after each migration) |
 | `supabase/tests/` | The database tests |
 | `supabase/setup.sql` | The current site's database (kept as it is) |
 | `messages/` | The words of the site in each language |

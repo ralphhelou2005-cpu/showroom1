@@ -1,7 +1,7 @@
 /* The one interactive moment: hold to build. Ported line for line from the original page script.
    Hold the dial for 11 seconds and the car comes together (a scrub film over five stills); let go and it eases back.
    Finished, the colour picker paints it. Works with mouse, touch and keyboard (space or enter). */
-const BASE = import.meta.env.BASE_URL;
+const BASE = '/';   /* the videos are served from public/assets */
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const STAGES = ['Carbon frame', 'Engine', 'Wheels and brakes', 'Bodywork', 'Paint'];
 const HOLD_SECONDS = 11, BACK_SECONDS = 5;

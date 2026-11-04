@@ -1,4 +1,4 @@
-import { asset } from '../data/images';
+import { asset } from '@/lib/media';
 import { vars } from './ui';
 
 /* the same seeded shuffle as before, so the last caption's words arrive in the same rhythm */
@@ -14,20 +14,22 @@ function Split({ text, seed }: { text: string; seed: number }) {
   );
 }
 
-export const POSTER = asset('assets/walk/first.webp');
-export const POSTER_PHONE = asset('assets/walk/first-phone.webp');
+export const poster = () => asset('assets/walk/first.webp');
+export const posterPhone = () => asset('assets/walk/first-phone.webp');
+
+/* the film's frame as plain HTML: the walk-in engine may start before React takes over the page and swaps the video
+   in it when the full-quality film arrives, so React leaves what is inside alone */
+const filmHtml = () =>
+  `<picture><source media="(max-aspect-ratio: 7/10)" srcset="${posterPhone()}"><img class="poster" id="poster" src="${poster()}" width="1920" height="1080" alt="" fetchpriority="high" decoding="async"></picture>` +
+  '<video class="frames" id="frames" muted playsinline preload="none" disablepictureinpicture></video>' +
+  '<div class="sweep" id="sweep"></div><i class="lb lb-t"></i><i class="lb lb-b"></i>';
 
 /* The walk-in. This is only the markup: src/lib/home.ts drives it as the page scrolls. */
 export default function Hero() {
   return (
     <div id="top" className="hero">
       <div className="stage" id="stage">
-        <div className="film-wrap" id="filmWrap" aria-hidden="true">
-          <picture><source media="(max-aspect-ratio: 7/10)" srcSet={POSTER_PHONE} /><img className="poster" id="poster" src={POSTER} width={1920} height={1080} alt="" fetchPriority="high" decoding="async" /></picture>
-          <video className="frames" id="frames" muted playsInline preload="none" disablePictureInPicture />
-          <div className="sweep" id="sweep" />
-          <i className="lb lb-t" /><i className="lb lb-b" />
-        </div>
+        <div className="film-wrap" id="filmWrap" aria-hidden="true" dangerouslySetInnerHTML={{ __html: filmHtml() }} />
         <div className="scrim" aria-hidden="true" />
         <div className="band b1" data-a="0" data-b=".24" style={vars({ opacity: 1, '--k': 1 })}><p>Milcar. Come inside.</p></div>
         <div className="band b2" data-a=".26" data-b=".48"><p>Every car has a story.</p></div>

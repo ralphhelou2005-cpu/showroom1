@@ -1,12 +1,12 @@
 # The Milcar database
 
-Supabase Postgres. The schema lives in `supabase/migrations/`, ten files applied once each, in name order.
+Supabase Postgres. The schema lives in `supabase/migrations/`, eleven files applied once each, in name order.
 They only add things: the current website's `public.cars`, `private.admins` and `car-photos` bucket are left
 untouched until the new platform replaces the site. Every rule below is tested in `supabase/tests/`
 (`npm run test:db`), on an in-memory Postgres set up like a Supabase project.
 
 **Applied to the live project (`nlhjnihjvlhimmigofbx`) on 2026-11-04**, at the owner's request (no separate
-staging project). The Supabase connector recorded them as `platform_01_foundation` … `platform_10_foreign_key_indexes`
+staging project), part 11 later the same day. The Supabase connector recorded them as `platform_01_foundation` … `platform_11_mirror_legacy_cars`
 with its own version numbers, so the history differs from the file names: if the Supabase CLI is used later, run
 `supabase migration repair` once to line them up. TypeScript types for every table are in `src/types/database.ts`;
 regenerate them after each migration. Because there is no staging copy, anything that writes data is tested on
@@ -75,6 +75,18 @@ There is always at least one active owner: the last one cannot be demoted, switc
 - **Histories** (status changes, lead activity, audit log) are written by triggers and cannot be edited.
 - **Errors** come back as stable codes the website translates, e.g. `booking.slot_full`,
   `booking.outside_opening_hours`, `vehicle.status_requires_manager`, `profile.last_owner`.
+
+## The mirror (part 11): the current admin page keeps working
+
+Until the new dashboard's inventory editor replaces it (Phase 5), the owner keeps editing the cars in the current
+site's admin page, which writes to `public.cars`. A trigger copies every change into the new tables at once: a new
+car, an edit (status, price, year, mileage, colour, text, photos, specs, sample flag) or a deletion. It runs as
+the person who made the change, so the vehicle's status history and the audit log show who did it. It rewrites
+photos and specs only when they changed. When Phase 5 takes over: `alter table public.cars disable trigger cars_mirror;`
+
+It was needed on day one: between the copy (part 9) and Phase 3, the Range Rover was reserved and the Porsche sold
+in the current admin, and the new pages still showed them as available. Applied 2026-11-04 with the owner's
+go-ahead; the new tables then matched the current admin exactly.
 
 ## Copying the current cars
 

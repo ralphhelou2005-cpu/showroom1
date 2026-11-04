@@ -28,5 +28,6 @@ dist/
 dist-ssr/
 .next/
 next-env.d.ts
+public/engine/
 *.tsbuildinfo
 .vercel/

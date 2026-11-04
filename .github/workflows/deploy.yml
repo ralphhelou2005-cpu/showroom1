@@ -1,4 +1,4 @@
-# Builds the site and publishes it on GitHub Pages:
+# Builds the current (legacy) site and publishes it on GitHub Pages, until the new platform replaces it on Vercel:
 # - every time something is uploaded to the main branch
 # - every night, so each car page's title and sharing picture follow the changes made in the admin
 # - by hand: GitHub > Actions > "Deploy to GitHub Pages" > Run workflow
@@ -31,7 +31,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - run: npm run legacy:build
       - uses: actions/upload-pages-artifact@v5.0.0
         with:
           path: dist

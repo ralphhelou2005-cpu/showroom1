@@ -1,7 +1,9 @@
-# Never upload secrets. The Supabase publishable key in assets/supabase-config.js is meant to be
-# public; the secret / service_role key, passwords and private keys must never be in this folder.
+# Never upload secrets. The Supabase publishable key is meant to be public; the secret / service_role key,
+# passwords and private keys must never be in this folder. Real values go in .env.local (never uploaded);
+# .env.example lists them with no values.
 .env
 .env.*
+!.env.example
 *.local
 *.key
 *.pem
@@ -21,6 +23,10 @@ desktop.ini
 .vscode/
 *.log
 
-# the build's output (GitHub Actions makes it fresh on every upload)
+# the build's output (GitHub Actions and Vercel make it fresh on every upload)
 dist/
 dist-ssr/
+.next/
+next-env.d.ts
+*.tsbuildinfo
+.vercel/

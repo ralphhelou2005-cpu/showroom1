@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2023",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
@@ -13,7 +17,36 @@
     "resolveJsonModule": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "types": ["vite/client", "node"]
+    "types": [
+      "vite/client",
+      "node"
+    ],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "allowJs": true,
+    "incremental": true,
+    "esModuleInterop": true
   },
-  "include": ["src", "vite.config.ts"]
+  "include": [
+    "src",
+    "messages",
+    "supabase/tests",
+    "vite.config.ts",
+    "vitest.config.ts",
+    "next.config.ts",
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

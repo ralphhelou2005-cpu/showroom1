@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "siteName": "Milcar",
+    "description": "Milcar, conseil automobile : des supercars et des SUV de luxe dont on connaît toute l’histoire."
+  },
+  "language": {
+    "label": "Langue",
+    "en": "English",
+    "fr": "Français",
+    "ar": "العربية"
+  },
+  "foundation": {
+    "label": "Plateforme Milcar",
+    "title": "Les fondations sont posées.",
+    "body": "Voici la base de travail de la nouvelle plateforme. Les pages du showroom y arrivent à l’étape suivante ; d’ici là, le site en ligne ne change pas."
+  }
+}

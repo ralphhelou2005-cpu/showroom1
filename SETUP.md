@@ -1,5 +1,9 @@
 # Milcar: the website, the cars database and the admin page
 
+> This guide is for the **current live site** (on `main`, GitHub Pages). The new platform being built on the
+> `platform` branch is described in [README.md](README.md) and [DEVELOPMENT_PROGRESS.md](DEVELOPMENT_PROGRESS.md).
+> On that branch the current site's commands are `npm run legacy:dev`, `legacy:build` and `legacy:preview`.
+
 The website is built with **React** (Vite + TypeScript). The cars live in **Supabase** (an online database).
 You manage them on the **admin page** (`admin.html`), and the inventory, the car pages and the windows of the
 dealership picture all read them from there.
@@ -96,14 +100,14 @@ You need **Node.js** (version 22 or newer) from [nodejs.org](https://nodejs.org)
    ```
 3. Start the site while you work on it:
    ```powershell
-   npm run dev
+   npm run legacy:dev
    ```
    Open **http://localhost:5173/showroom1/**. Changes to the files show in the browser straight away.
    The admin page is at **http://localhost:5173/showroom1/admin.html**.
 4. To see exactly what will go online, build it and open the built copy:
    ```powershell
-   npm run build
-   npm run preview
+   npm run legacy:build
+   npm run legacy:preview
    ```
    Open **http://localhost:4173/showroom1/**. This copy behaves like GitHub Pages (addresses, the 404 page).
 5. To stop, go back to PowerShell and press **Ctrl+C**.
@@ -138,7 +142,7 @@ Two parts of the site are pictures rather than lists, so they change by hand:
 
 ## 6. Test everything locally
 
-With `npm run build` and `npm run preview` running (part 4):
+With `npm run legacy:build` and `npm run legacy:preview` running (part 4):
 
 1. Open http://localhost:4173/showroom1/inventory. You should see your cars, the filters, and no error message.
 2. In another tab, open http://localhost:4173/showroom1/admin.html and log in.
@@ -171,7 +175,7 @@ Each build takes about a minute. Its progress, and any error, is under **Actions
 1. In `vite.config.ts`, change `base: '/showroom1/'` to `base: '/'`. In `src/config.ts`, change `SITE_ORIGIN`
    to the new address (for example `https://milcar.netlify.app`). Upload the change.
 2. In Netlify, click **Add new site → Import an existing project → GitHub**, and pick `showroom1`.
-3. Set **Build command** to `npm run build` and **Publish directory** to `dist`. Click **Deploy**.
+3. Set **Build command** to `npm run legacy:build` and **Publish directory** to `dist`. Click **Deploy**.
    Every upload to GitHub then updates Netlify too.
 
 - Supabase needs no change for the new address (the email and password login doesn't depend on it).

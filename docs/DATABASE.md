@@ -1,9 +1,16 @@
 # The Milcar database
 
-Supabase Postgres. The schema lives in `supabase/migrations/`, nine files applied once each, in name order.
+Supabase Postgres. The schema lives in `supabase/migrations/`, ten files applied once each, in name order.
 They only add things: the current website's `public.cars`, `private.admins` and `car-photos` bucket are left
 untouched until the new platform replaces the site. Every rule below is tested in `supabase/tests/`
 (`npm run test:db`), on an in-memory Postgres set up like a Supabase project.
+
+**Applied to the live project (`nlhjnihjvlhimmigofbx`) on 2026-11-04**, at the owner's request (no separate
+staging project). The Supabase connector recorded them as `platform_01_foundation` … `platform_10_foreign_key_indexes`
+with its own version numbers, so the history differs from the file names: if the Supabase CLI is used later, run
+`supabase migration repair` once to line them up. TypeScript types for every table are in `src/types/database.ts`;
+regenerate them after each migration. Because there is no staging copy, anything that writes data is tested on
+the in-memory database, never on the live one.
 
 ## Tables
 
@@ -76,11 +83,22 @@ addresses (`vehicles.slug` = the old id), English text, photo order and spec ord
 cars added since. On today's data it creates six brands from the makes, including "GT3 RS" (the Porsche's make
 and model are swapped in the current data: correct it in the dashboard after the switch).
 
-## Applying the migrations
+## Adding a migration later
 
-Never to production without a backup and the owner's go-ahead. Order of use:
+Never to the live project without a backup and the owner's go-ahead.
 
-1. Local: `npm run test:db` (no setup needed).
-2. Staging: a separate free Supabase project. `npx supabase link --project-ref <staging ref>` then
-   `npx supabase db push`, or paste each file into the SQL editor in name order.
-3. Production, at the switch (Phase 10): back up first, then the same command against the production project.
+1. Write the next file in `supabase/migrations/` (never edit one that has been applied).
+2. `npm run test:db` until every test passes, with new tests for the new rules.
+3. Snapshot what the change touches, apply it (Supabase connector, `supabase db push`, or the SQL editor),
+   then check the data, the API as a visitor, Supabase's advisors and the live site.
+4. Regenerate `src/types/database.ts`.
+
+## Supabase advisors after part 10 (2026-11-04)
+
+- Security, intended: `private.admins` and `private.rate_limits` have no rules because nothing outside the
+  database may reach them; `available_slots` is open to visitors on purpose (it lists free times only);
+  `mark_notifications_read` only touches the caller's own messages.
+- Security, the owner's setting: leaked-password protection is off (Supabase > Authentication > settings).
+- Performance: seven tables give staff two read rules where one would do (the inventory, settings, hours and
+  closures "write" rules also cover reading). Harmless at this size; Phase 9 replaces them with separate
+  insert / update / delete rules. "Unused index" notes are normal for a new database.

@@ -1,13 +1,13 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigationType } from 'react-router';
 import Nav from './components/Nav';
-import Home from './pages/Home';
+import Home from './screens/Home';
 
 /* the home page loads with the site; the other pages load when first opened */
-const Inventory = lazy(() => import('./pages/Inventory'));
-const CarPage = lazy(() => import('./pages/Car'));
-const Featured = lazy(() => import('./pages/Featured'));
-const NotFound = lazy(() => import('./pages/NotFound'));
+const Inventory = lazy(() => import('./screens/Inventory'));
+const CarPage = lazy(() => import('./screens/Car'));
+const Featured = lazy(() => import('./screens/Featured'));
+const NotFound = lazy(() => import('./screens/NotFound'));
 
 /* old addresses people may have shared keep working: car.html?id=f8-tributo becomes /car/f8-tributo */
 function OldLink({ to }: { to: 'home' | 'inventory' | 'featured' | 'car' }) {

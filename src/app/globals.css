@@ -1,0 +1,30 @@
+/* The site's look plus Tailwind for the platform's new screens (dashboard, forms, new pages).
+   - src/styles/site.css is the site's own stylesheet, unchanged. It sits in its own layer ("site"), so its
+     rules keep exactly their order among themselves, and a Tailwind class wins wherever one is written.
+   - Tailwind's reset (preflight) is left out on purpose, so it can never alter an existing section.
+   - Tailwind's colours and fonts are the site's own variables: one set of design values for both. */
+@layer theme, site, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import '../styles/site.css' layer(site);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-panel: var(--panel);
+  --color-panel-2: var(--panel-2);
+  --color-champagne: var(--champagne);
+  --color-champagne-hi: var(--champagne-hi);
+  --color-champagne-lo: var(--champagne-lo);
+  --color-accent: var(--accent);
+  --color-ink: var(--text-primary);
+  --color-muted: var(--text-secondary);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --font-display: var(--display);
+  --font-body: var(--body);
+  --font-script: var(--script);
+  --ease-luxe: var(--ease);
+}
+
+/* the right-to-left layout for Arabic: Tailwind's logical utilities (ms-, me-, ps-, pe-, start-, end-) mirror
+   by themselves; anything directional in site.css gets its mirror in Phase 8 */

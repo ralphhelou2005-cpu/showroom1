@@ -2,7 +2,8 @@
 
 > This guide is for the **current live site** (on `main`, GitHub Pages). The new platform being built on the
 > `platform` branch is described in [README.md](README.md) and [DEVELOPMENT_PROGRESS.md](DEVELOPMENT_PROGRESS.md).
-> On that branch the current site's commands are `npm run legacy:dev`, `legacy:build` and `legacy:preview`.
+> The current site's files are on `main` only (`git switch main` to work on it); on `platform` its pages have
+> moved into the new platform.
 
 The website is built with **React** (Vite + TypeScript). The cars live in **Supabase** (an online database).
 You manage them on the **admin page** (`admin.html`), and the inventory, the car pages and the windows of the

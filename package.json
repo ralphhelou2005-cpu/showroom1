@@ -4,15 +4,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "tsc --noEmit && next build",
+    "assets": "node scripts/assets-manifest.mjs && node scripts/build-engine.mjs",
+    "dev": "npm run assets && next dev",
+    "build": "npm run assets && tsc --noEmit && next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:db": "vitest run supabase/tests",
-    "legacy:dev": "vite",
-    "legacy:build": "tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
-    "legacy:preview": "node scripts/serve.mjs"
+    "test:db": "vitest run supabase/tests"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
@@ -21,7 +19,6 @@
     "next-intl": "4.14.9",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "react-router": "8.5.0",
     "server-only": "0.0.1",
     "zod": "4.6.7"
   },
@@ -31,7 +28,6 @@
     "@types/node": "26.6.5",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
-    "@vitejs/plugin-react": "6.1.2",
     "tailwindcss": "4.3.3",
     "typescript": "7.0.2",
     "vite": "8.3.4",

@@ -1,22 +1,22 @@
+'use client';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { useSearchParams } from 'react-router';
-import { asset } from '../data/images';
 
-/* "Book a private viewing." The form isn't connected until the owner chooses where it sends.
-   A car page links here with ?car=<name>, which fills in the car. */
-export default function BookingForm() {
-  const [params] = useSearchParams();
-  const wanted = params.get('car');
+/* "Book a private viewing." Sending arrives with the booking system (Phase 7): until then the form says plainly that
+   nothing was sent. A car page links here with ?car=<name>, which fills in the car once the page is in the browser
+   (as before: the built page has the field empty). `image` is the showroom picture beside the form. */
+export default function BookingForm({ image }: { image: { src: string; set: string } }) {
   const [sent, setSent] = useState(false);
   const car = useRef<HTMLInputElement>(null);
-  /* filled in after the page appears, as before (the built page has the field empty) */
-  useEffect(() => { if (wanted && car.current) car.current.value = wanted; }, [wanted]);
+  useEffect(() => {
+    const wanted = new URLSearchParams(location.search).get('car');
+    if (wanted && car.current) car.current.value = wanted;
+  }, []);
   /* the page got shorter: the tail-light streak follows */
   useEffect(() => { if (sent) dispatchEvent(new Event('milcar:layout')); }, [sent]);
   const send = (e: FormEvent) => { e.preventDefault(); setSent(true); };
   return (
     <section className="book" id="book">
-      <div className="book-img"><img src={asset('assets/hero-poster.webp')} srcSet={`${asset('assets/hero-poster-1100.webp')} 1100w, ${asset('assets/hero-poster.webp')} 1728w`} sizes="(max-width:900px) 100vw, 55vw" width={1728} height={972} alt="The Milcar showroom glowing at night" loading="lazy" decoding="async" /></div>
+      <div className="book-img"><img src={image.src} srcSet={image.set} sizes="(max-width:900px) 100vw, 55vw" width={1728} height={972} alt="The Milcar showroom glowing at night" loading="lazy" decoding="async" /></div>
       <div className={'book-form' + (sent ? ' sent' : '')} id="bookForm">
         <h2>Book a private viewing.</h2>
         <p>Tell us how to reach you and which car you want to see.</p>

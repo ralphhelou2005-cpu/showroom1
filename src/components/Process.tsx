@@ -1,4 +1,4 @@
-import { asset } from '../data/images';
+import { asset } from '@/lib/media';
 import { vars } from './ui';
 
 const STEPS = [

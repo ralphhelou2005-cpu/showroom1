@@ -5,13 +5,36 @@ import { routing } from './i18n/routing';
 
 const intl = createIntlProxy(routing);
 
+/* the current site's addresses keep working: car.html?id=f8-tributo becomes /car/f8-tributo, and so on.
+   (The address in the browser keeps its #part, like #book, by itself.) */
+function oldAddress(request: NextRequest): NextResponse | null {
+  const { pathname, searchParams, search } = request.nextUrl;
+  const to = (path: string, keepQuery = false) => {
+    const url = request.nextUrl.clone();
+    url.pathname = path;
+    url.search = keepQuery ? search : '';
+    return NextResponse.redirect(url, 308);
+  };
+  if (pathname === '/index.html') return to('/', true);
+  if (pathname === '/inventory.html') return to('/inventory', true);
+  if (pathname === '/featured.html') return to('/featured', true);
+  if (pathname === '/car.html' || pathname === '/car' || pathname === '/car/') {
+    const id = searchParams.get('id');
+    return to(id && /^[a-z0-9]+(-[a-z0-9]+)*$/.test(id) ? '/car/' + id : '/inventory');
+  }
+  return null;
+}
+
 /* Runs before every page.
+   - old addresses: sent on to their new ones.
    - /admin: keeps the staff login fresh, and sends anyone not logged in to the login page.
      (This is only the front door: every page and action checks the role again on the server, and the
      database rules check it a third time.)
    - everything else: picks the language from the address (/fr/…, /ar/…, or English). */
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const moved = oldAddress(request);
+  if (moved) return moved;
   if (pathname === '/admin' || pathname.startsWith('/admin/')) return admin(request);
   return intl(request);
 }
@@ -44,6 +67,6 @@ async function admin(request: NextRequest) {
 }
 
 export const config = {
-  /* not for files (anything with a dot), Next.js internals, or the server's own endpoints */
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  /* not for files (anything with a dot, except the old .html addresses), Next.js internals, or the server's own endpoints */
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)', '/(index|inventory|featured|car)\\.html'],
 };

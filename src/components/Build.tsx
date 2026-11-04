@@ -1,6 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { startBuild } from '../lib/build';
-import { asset } from '../data/images';
+import { asset } from '@/lib/media';
+import BuildEngine from './BuildEngine';
 import { vars } from './ui';
 
 const set = (name: string, big: number) => `${asset(`assets/${name}-800.webp`)} 800w, ${asset(`assets/${name}.webp`)} ${big}w`;
@@ -10,10 +9,9 @@ const PARTS = ['Carbon frame', 'Engine', 'Wheels and brakes', 'Bodywork', 'Paint
 
 /* "See what's under the paint": the hold-to-build tool with the colour picker (driven by src/lib/build.ts) */
 export default function Build() {
-  const root = useRef<HTMLElement>(null);
-  useEffect(() => startBuild(root.current!), []);
   return (
-    <section className="build" id="build" aria-labelledby="buildTitle" ref={root}>
+    <section className="build" id="build" aria-labelledby="buildTitle">
+      <BuildEngine />
       <div className="build-head reveal">
         <h2 id="buildTitle" className="rv">See what's under the paint.</h2>
         <p className="label rv" style={vars({ '--i': 1 })}>Hold the button. Let go and it eases back.</p>

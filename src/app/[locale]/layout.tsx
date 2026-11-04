@@ -1,33 +1,39 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { hasLocale } from 'next-intl';
+import { setRequestLocale } from 'next-intl/server';
+import Nav from '@/components/Nav';
+import PageChrome from '@/components/PageChrome';
 import { dir, routing } from '@/i18n/routing';
+import { fontVariables } from '../fonts';
 import '../globals.css';
 
 type Props = { children: ReactNode; params: Promise<{ locale: string }> };
 
-/* every language's pages are built ahead of time */
 export function generateStaticParams() {
   return routing.locales.map(locale => ({ locale }));
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'meta' });
-  return { title: t('siteName'), description: t('description') };
-}
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+};
 
-/* the page frame for every public page, in the visitor's language and reading direction */
+export const viewport: Viewport = { themeColor: '#0B0D14' };
+
+/* the frame of every public page: the visitor's language and reading direction, the nav, the background.
+   Words are translated on the server; the browser gets no translation library (see src/i18n/link.tsx). */
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   return (
-    <html lang={locale} dir={dir(locale)}>
+    <html lang={locale} dir={dir(locale)} className={fontVariables} data-scroll-behavior="smooth">
       <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <a className="skip" href="#main">Skip to content</a>
+        <PageChrome />
+        <Nav />
+        {children}
       </body>
     </html>
   );

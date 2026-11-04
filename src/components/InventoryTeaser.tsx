@@ -1,5 +1,5 @@
-import { Link } from 'react-router';
-import { photo, photoSet } from '../data/images';
+import { Link } from '@/i18n/link';
+import { sitePhoto } from '@/lib/media';
 import { vars } from './ui';
 
 /* three cars from the showroom as a way into the inventory */
@@ -16,12 +16,13 @@ export default function InventoryTeaser() {
         <p className="label rv">The inventory</p>
         <h2 className="rv" style={vars({ '--i': 1 })}>Every car, with its story.</h2>
         <p className="rv" style={vars({ '--i': 2 })}>See what's in the showroom, then ask for the history of the one you want.</p>
-        <Link className="btn rv" style={vars({ '--i': 3 })} to="/inventory">View the inventory</Link>
+        <Link className="btn rv" style={vars({ '--i': 3 })} href="/inventory">View the inventory</Link>
       </div>
       <div className="teaser-cars rv" style={vars({ '--i': 2 })}>
-        {TEASER.map(t => (
-          <Link key={t.id} to={'/car/' + t.id} aria-label={t.label}><img src={photo(t.img)} srcSet={photoSet(t.img)} sizes="(max-width:900px) 60vw, 30vw" width={1500} height={1000} alt={t.alt} loading="lazy" decoding="async" /></Link>
-        ))}
+        {TEASER.map(t => {
+          const p = sitePhoto(t.img);
+          return <Link key={t.id} href={'/car/' + t.id} aria-label={t.label}><img src={p.src} srcSet={p.set} sizes="(max-width:900px) 60vw, 30vw" width={1500} height={1000} alt={t.alt} loading="lazy" decoding="async" /></Link>;
+        })}
       </div>
     </section>
   );

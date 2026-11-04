@@ -2,7 +2,7 @@
    Ported line for line from the original page script. Everything runs on the elements themselves through
    requestAnimationFrame and IntersectionObserver: nothing here re-renders React while the page scrolls.
    startHome() returns a function that stops it all when the visitor leaves the page. */
-const BASE = import.meta.env.BASE_URL;
+const BASE = '/';   /* the videos are served from public/assets */
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 const smoothstep = (p: number, a: number, b: number) => { const t = clamp((p - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 

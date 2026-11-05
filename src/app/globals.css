@@ -2,7 +2,9 @@
    - src/styles/site.css is the site's own stylesheet, unchanged. It sits in its own layer ("site"), so its
      rules keep exactly their order among themselves, and a Tailwind class wins wherever one is written.
    - Tailwind's reset (preflight) is left out on purpose, so it can never alter an existing section.
-   - Tailwind's colours and fonts are the site's own variables: one set of design values for both. */
+   - Tailwind's colours and fonts are the site's own variables: one set of design values for both.
+   - site.css has its own .grid (the inventory's car grid), which Tailwind's `grid` class would pick up too:
+     new screens write `[display:grid]` instead (md:grid and the other prefixed forms are fine). */
 @layer theme, site, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import '../styles/site.css' layer(site);

@@ -1,0 +1,5 @@
+{
+  "//": "What `npm run typecheck` and `npm run build` check: tsconfig.json without .next/dev/types, which `next dev` adds back to tsconfig.json and whose generated file has unused imports.",
+  "extends": "./tsconfig.json",
+  "include": ["src", "messages", "supabase/tests", "e2e", "vitest.config.ts", "next.config.ts", "next-env.d.ts", ".next/types/**/*.ts"]
+}

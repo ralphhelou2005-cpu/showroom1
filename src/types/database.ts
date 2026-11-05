@@ -1119,6 +1119,7 @@ export type Database = {
           slot_start: string
         }[]
       }
+      dashboard_overview: { Args: never; Returns: Json }
       hit_rate_limit: {
         Args: { p_key: string; p_max: number; p_window_seconds: number }
         Returns: boolean
@@ -1126,6 +1127,20 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       mark_notifications_read: { Args: { p_ids: string[] }; Returns: number }
       my_role: { Args: never; Returns: Database["public"]["Enums"]["app_role"] }
+      team_members: {
+        Args: never
+        Returns: {
+          active: boolean
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          joined: boolean
+          last_sign_in_at: string
+          phone: string
+          role: Database["public"]["Enums"]["app_role"]
+        }[]
+      }
     }
     Enums: {
       activity_type:

@@ -59,10 +59,30 @@ The live website (`main`, GitHub Pages) does not change until Phase 10, and only
   Next.js's own router code. The first picture appears sooner on the platform, since pages arrive drawn.
 - Lighthouse mobile (median of three, both sites served locally): home 92 (current 97), inventory **88**
   (current 99), car 94 (94), featured 95 (94), brands 93, about 94, contact 96, private viewing 96; accessibility,
-  best practices and SEO 100 everywhere. **Open:** the inventory's largest picture waits about 1.4 s after it has
-  loaded before it is painted ("render delay"; 0.23 s on the current site), and the home page's picture about
-  0.5 s. To fix before Phase 4: find what holds the paint (likely the cards' rise-in animation and the extra
-  script), then rerun the full regression pass (pixel comparisons, interactions, end-to-end, handover, Lighthouse).
+  best practices and SEO 100 everywhere. The inventory's "render delay" is explained below (speed follow-up).
+
+**Speed follow-up (2026-11-05)**
+- Fixed: every link back to the home page fetched it ahead, and with it the walk-in's film and first picture
+  (about 680 KB on a phone): every other page downloaded them in the background, taking the connection from its
+  own photos (about 1.5 s of the owner's 3.6 Mbps line). Links to the home page now load it on the click
+  (`src/i18n/link.tsx`), as on the current site; the walk-in starts as before.
+- Found: the late paint in Lighthouse is not the animation or our code. Chrome 155 holds the first paint while
+  preloaded web fonts load (its "render-blocking fonts" rule), and in Lighthouse's freshly started browser that
+  hold often lasts until 1.2–2.2 s on the platform's pages. With the rule switched off, the inventory paints at
+  0.2–0.4 s and scores 93. Removing the font preloads or Next.js's stand-in fonts does not stop it, so no font
+  setting on our side controls it. In an open browser loading the page fresh, which is how visitors arrive,
+  both sites paint in 0.1–0.3 s; in freshly started browsers outside Lighthouse both paint at about 0.6 s, with
+  occasional slow loads on both.
+- The rest of the gap is the size of Next.js's own code (about 145 KB, against 93 KB for the current site):
+  without any script the inventory scores 98. Lighthouse counts it because the page's first paint follows it.
+- Scores on this computer swing by 5–10 points between runs and between sessions (on 2026-11-05 the current
+  site's inventory scored 93–99 and the platform's 75–91). The reliable number comes from PageSpeed Insights on
+  the hosted preview (Phase 4), which runs on Google's servers.
+- Rerun after the fix: 48 pixel comparisons (one walk-in moment differed in the first pass and matched in the
+  rerun: a timing difference), 26 interactions, 36 end-to-end checks on a computer and a phone, the walk-in
+  handover, 8 new checks that the home links open the home page and download its film only on the click, 85
+  database tests. Walk-in at 3.6 Mbps: computer ready at 1.65–2.01 s (current site 1.94–2.24 s); phone engine
+  started at 1.0 s and the walk-in ready at 2.65–2.75 s (current site 1.0–1.7 s and 2.5 s).
 
 **Not done yet / carried forward**
 - The booking form still says plainly that nothing was sent: the booking system connects it in Phase 7.

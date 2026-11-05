@@ -9,7 +9,7 @@ The live website (`main`, GitHub Pages) does not change until Phase 10, and only
 | 2 | Architecture and database | ✅ Done 2026-11-04 |
 | 3 | Public website | ✅ Done 2026-11-04 |
 | 4 | Logins and dashboard | ✅ Done 2026-11-05 |
-| 5 | Inventory CMS | ✅ Built and tested 2026-11-05 (database part 13 waits for the owner's go-ahead) |
+| 5 | Inventory CMS | ✅ Done 2026-11-05 |
 | 6 | CRM | |
 | 7 | Booking and WhatsApp | |
 | 8 | Languages (full French and Arabic, right to left) | |
@@ -59,12 +59,17 @@ The live website (`main`, GitHub Pages) does not change until Phase 10, and only
   wrong VIN refused; adds a brand); a salesperson (sees, changes nothing); removing a video, deleting cars and their
   files, brands, the note on cars from the current admin page; no sideways scrolling on a phone; no browser errors.
 - The 60 checks of Phase 4 still pass; 109 database tests; production build.
-- The public site against the current one: identical except the home page's three cars, which follow the featured
-  cars once part 13 is on the live project (until then the first three cars show). 26 interactions identical.
+- The public site against the current one, rebuilt after part 13 went live: all 48 picture comparisons identical
+  (the home page's three cars included; a first run right after starting the servers caught the nav underline still
+  animating, as before), 26 interactions identical, 36 end-to-end checks on a computer and a phone, the walk-in
+  handover. Before part 13, only the home page's three cars differed, as expected.
+
+**Applied to the live project (2026-11-05)**, with the owner's go-ahead: database part 13. Checked afterwards: the
+three home page cars featured 1 to 3 with their photos' descriptions; 7 cars, 13 photos and 9 history lines as
+before; visitors can't call the three functions; a login without a role was refused a duplicate. Types regenerated:
+unchanged from the ones written by hand.
 
 **Not done yet / carried forward**
-- Database part 13 is not on the live project yet: it needs the owner's go-ahead. It also sets the three featured
-  cars and their photos' descriptions (no other data changes).
 - Equipment lists and history lines (the database has room for them beside the specs) aren't in the editor yet: the
   car page shows specs only.
 - The mirror is switched off at the switch (Phase 10).

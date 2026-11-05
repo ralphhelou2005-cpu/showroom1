@@ -6,8 +6,8 @@ untouched until the new platform replaces the site. Every rule below is tested i
 (`npm run test:db`), on an in-memory Postgres set up like a Supabase project.
 
 **Applied to the live project (`nlhjnihjvlhimmigofbx`) on 2026-11-04**, at the owner's request (no separate
-staging project), part 11 later the same day, part 12 on 2026-11-05 (`platform_12_dashboard`), each with the
-owner's go-ahead. The Supabase connector recorded them as `platform_01_foundation` … `platform_11_mirror_legacy_cars`
+staging project), part 11 later the same day, parts 12 and 13 on 2026-11-05 (`platform_12_dashboard`,
+`platform_13_inventory_editor`), each with the owner's go-ahead. The Supabase connector recorded them as `platform_01_foundation` … `platform_13_inventory_editor`
 with its own version numbers, so the history differs from the file names: if the Supabase CLI is used later, run
 `supabase migration repair` once to line them up. TypeScript types for every table are in `src/types/database.ts`;
 regenerate them after each migration. Because there is no staging copy, anything that writes data is tested on

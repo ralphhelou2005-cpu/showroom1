@@ -6,9 +6,14 @@ import type { Role } from '@/lib/roles';
 /* the dashboard's pages, each for the roles that use it; each later part of the platform adds its own here */
 const PAGES: [href: string, label: string, roles?: Role[]][] = [
   ['/admin', 'Overview'],
+  ['/admin/leads', 'Leads', ['OWNER', 'MANAGER', 'SALESPERSON']],
+  ['/admin/viewings', 'Viewings', ['OWNER', 'MANAGER', 'SALESPERSON']],
+  ['/admin/customers', 'Customers', ['OWNER', 'MANAGER', 'SALESPERSON']],
   ['/admin/inventory', 'Inventory'],
   ['/admin/brands', 'Brands', ['OWNER', 'MANAGER', 'INVENTORY_EDITOR']],
+  ['/admin/analytics', 'Analytics', ['OWNER', 'MANAGER']],
   ['/admin/team', 'Team'],
+  ['/admin/settings', 'Settings', ['OWNER', 'MANAGER']],
   ['/admin/account', 'Your account'],
 ];
 

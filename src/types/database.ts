@@ -1112,6 +1112,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      analytics_summary: { Args: { p_days?: number }; Returns: Json }
       available_slots: {
         Args: { p_from: string; p_to: string; p_vehicle_id?: string }
         Returns: {
@@ -1133,6 +1134,7 @@ export type Database = {
         Returns: undefined
       }
       save_vehicle: { Args: { p: Json }; Returns: string }
+      submit_inquiry: { Args: { p: Json }; Returns: Json }
       team_members: {
         Args: never
         Returns: {

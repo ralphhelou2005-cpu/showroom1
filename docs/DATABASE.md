@@ -6,8 +6,8 @@ untouched until the new platform replaces the site. Every rule below is tested i
 (`npm run test:db`), on an in-memory Postgres set up like a Supabase project.
 
 **Applied to the live project (`nlhjnihjvlhimmigofbx`) on 2026-11-04**, at the owner's request (no separate
-staging project), part 11 later the same day. Part 12 (2026-11-05) is written and tested, and waits for the
-owner's go-ahead before it is applied. The Supabase connector recorded them as `platform_01_foundation` … `platform_11_mirror_legacy_cars`
+staging project), part 11 later the same day, part 12 on 2026-11-05 (`platform_12_dashboard`), each with the
+owner's go-ahead. The Supabase connector recorded them as `platform_01_foundation` … `platform_11_mirror_legacy_cars`
 with its own version numbers, so the history differs from the file names: if the Supabase CLI is used later, run
 `supabase migration repair` once to line them up. TypeScript types for every table are in `src/types/database.ts`;
 regenerate them after each migration. Because there is no staging copy, anything that writes data is tested on
@@ -101,6 +101,13 @@ Two read-only functions; no table or data changes.
   seven days (in the showroom's time zone); the team by role; the last eight changes to the cars and who made them.
   It runs as the person asking, so every number follows their rules: a salesperson counts their own and unassigned
   leads, an inventory editor sees no leads or viewings.
+
+Checked on the live project after applying (read-only, as the owner and as a login without a profile, then rolled
+back): visitors can't call either function; the owner's overview shows 5 cars on sale, 1 reserved, 1 sold, and the
+Porsche's sale and the Range Rover's reservation among the latest changes; a login without a profile sees no team
+and no history; the cars and their history unchanged. Supabase's security advisor lists `team_members()` as a
+privileged function staff can call: intended, since it checks that the caller is staff and returns only whether
+each person has joined and when they last signed in.
 
 ## Copying the current cars
 

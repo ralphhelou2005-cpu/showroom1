@@ -8,7 +8,7 @@ The live website (`main`, GitHub Pages) does not change until Phase 10, and only
 | 1 | Audit and plan | ✅ Done 2026-11-04 |
 | 2 | Architecture and database | ✅ Done 2026-11-04 |
 | 3 | Public website | ✅ Done 2026-11-04 |
-| 4 | Logins and dashboard | ✅ Built and tested 2026-11-05 (database part 12 waits for the owner's go-ahead) |
+| 4 | Logins and dashboard | ✅ Done 2026-11-05 |
 | 5 | Inventory CMS | Next |
 | 6 | CRM | |
 | 7 | Booking and WhatsApp | |
@@ -55,9 +55,11 @@ The live website (`main`, GitHub Pages) does not change until Phase 10, and only
   (new screens write `[display:grid]`, noted in `globals.css`); forms emptied themselves after an error (they now
   keep what was typed, except passwords).
 
+**Applied to the live project (2026-11-05)**, with the owner's go-ahead: database part 12, checked read-only as
+the owner and as a login without a profile (docs/DATABASE.md). Types regenerated: unchanged from the ones written
+by hand.
+
 **Not done yet / carried forward**
-- Database part 12 is not on the live project yet: it needs the owner's go-ahead. Until then the live dashboard
-  can't show the team or the overview.
 - The dashboard isn't online: it needs hosting (decision 1) and `SUPABASE_SECRET_KEY` in the server's settings.
 - Supabase settings to make once (README, "Supabase settings the dashboard needs"): the redirect address, sign-ups
   off, the reset-password email link.

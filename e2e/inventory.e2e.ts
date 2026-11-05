@@ -68,12 +68,15 @@ try {
     await row.locator('input').nth(1).fill(value);
   }
   check((await text(page, 'aside')).includes('Unsaved changes'), 'unsaved changes are shown');
-  await page.click('button:has-text("Create the car")');
+  check((await text(page, 'section[aria-labelledby=media-new]')).includes('Create the car and add photos'), 'a new car shows where its photos go, and how to get there');
+  await page.click('aside button:has-text("Create the car")');
   await alert(page).waitFor();
   check((await alert(page).innerText()).includes('17 letters'), 'a wrong VIN is refused with what a VIN looks like');
   await page.fill('input[name=vin]', 'ZFF98RNA0P0123456');
-  await page.click('button:has-text("Create the car")');
-  await page.waitForURL(/\/admin\/inventory\/[0-9a-f-]{36}\?saved=1$/);
+  await page.click('section[aria-labelledby=media-new] button');
+  await page.waitForURL(/\/admin\/inventory\/[0-9a-f-]{36}\?saved=1#media$/);
+  await page.locator('#media').waitFor();
+  check(await page.evaluate(() => { const r = document.getElementById('media')!.getBoundingClientRect(); return r.top >= 0 && r.top < innerHeight; }), 'once created, the page opens at its photos');
   const id = page.url().match(/inventory\/([0-9a-f-]{36})/)![1];
   const [roma] = await q(`select slug, publication, status, mileage_km, price::text, vin from public.vehicles where id = $1`, [id]);
   check(roma.slug === 'ferrari-roma-2023' && roma.publication === 'draft' && roma.status === 'available' && roma.mileage_km === 4200 && roma.price === '245000.00',

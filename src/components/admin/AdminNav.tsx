@@ -1,20 +1,23 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import type { Role } from '@/lib/roles';
 
-/* the dashboard's pages; each later part of the platform adds its own here when it exists */
-const PAGES = [
+/* the dashboard's pages, each for the roles that use it; each later part of the platform adds its own here */
+const PAGES: [href: string, label: string, roles?: Role[]][] = [
   ['/admin', 'Overview'],
+  ['/admin/inventory', 'Inventory'],
+  ['/admin/brands', 'Brands', ['OWNER', 'MANAGER', 'INVENTORY_EDITOR']],
   ['/admin/team', 'Team'],
   ['/admin/account', 'Your account'],
-] as const;
+];
 
-export default function AdminNav() {
+export default function AdminNav({ role }: { role: Role }) {
   const path = usePathname();
   return (
     <nav aria-label="Dashboard">
       <ul className="m-0 flex list-none gap-1 overflow-x-auto p-0 md:flex-col">
-        {PAGES.map(([href, label]) => {
+        {PAGES.filter(([, , roles]) => !roles || roles.includes(role)).map(([href, label]) => {
           const here = href === '/admin' ? path === '/admin' : path.startsWith(href);
           return (
             <li key={href}>

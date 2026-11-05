@@ -1,6 +1,6 @@
 # The Milcar database
 
-Supabase Postgres. The schema lives in `supabase/migrations/`, twelve files applied once each, in name order.
+Supabase Postgres. The schema lives in `supabase/migrations/`, thirteen files applied once each, in name order.
 They only add things: the current website's `public.cars`, `private.admins` and `car-photos` bucket are left
 untouched until the new platform replaces the site. Every rule below is tested in `supabase/tests/`
 (`npm run test:db`), on an in-memory Postgres set up like a Supabase project.
@@ -83,7 +83,10 @@ Until the new dashboard's inventory editor replaces it (Phase 5), the owner keep
 site's admin page, which writes to `public.cars`. A trigger copies every change into the new tables at once: a new
 car, an edit (status, price, year, mileage, colour, text, photos, specs, sample flag) or a deletion. It runs as
 the person who made the change, so the vehicle's status history and the audit log show who did it. It rewrites
-photos and specs only when they changed. When Phase 5 takes over: `alter table public.cars disable trigger cars_mirror;`
+photos and specs only when they changed. The new dashboard's inventory editor (Phase 5) shows a note on these cars: until the
+switch, a change in the current admin page replaces the same details edited in the new one. Cars added in the new
+editor are never touched by the mirror. On the day the new dashboard takes over (the switch, Phase 10):
+`alter table public.cars disable trigger cars_mirror;`
 
 It was needed on day one: between the copy (part 9) and Phase 3, the Range Rover was reserved and the Porsche sold
 in the current admin, and the new pages still showed them as available. Applied 2026-11-04 with the owner's
@@ -108,6 +111,29 @@ Porsche's sale and the Range Rover's reservation among the latest changes; a log
 and no history; the cars and their history unchanged. Supabase's security advisor lists `team_members()` as a
 privileged function staff can call: intended, since it checks that the caller is staff and returns only whether
 each person has joined and when they last signed in.
+
+## The inventory editor (part 13)
+
+Three functions the dashboard's inventory editor calls, each running as the person using it, so the inventory
+rules and the vehicle guard decide (an inventory editor publishes but can't reserve or sell; a salesperson changes
+nothing):
+
+- `save_vehicle(p)`: a car, its text in each language and its specs, saved all or nothing. A language whose fields
+  are all empty is removed; specs are rewritten only when they changed. A car featured at a position another
+  featured car has takes that place, and the cars from there on move down one.
+- `duplicate_vehicle(id)`: a draft copy (`-copy`, `-copy-2`, …) with the text and specs. Photos and videos stay
+  with the original (their files belong to it), and the VIN isn't copied.
+- `reorder_vehicle_media(vehicle, ids)`: a car's photos and videos in a new order; the first photo is the main
+  picture everywhere.
+
+And one data change, made once: the home page's inventory teaser now shows the featured cars, so the three cars
+it has always shown (F8 Tributo, Huracán EVO, G 63) become featured 1 to 3, and their main photos get the
+descriptions the page has always given them. Only while no car is featured, so running it again never undoes a
+choice made in the dashboard. Nothing else changes.
+
+Photos and videos are uploaded by the browser straight to the `media` bucket, as the person (the bucket's rules
+decide), under `vehicles/<car id>/`: each photo as a 1500 px WebP with an 800 px copy beside it (`-800`), each video
+as it is with a still (`-poster.webp`). Deleting a photo, a video or a car removes its files too.
 
 ## Copying the current cars
 

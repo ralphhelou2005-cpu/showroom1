@@ -1120,6 +1120,7 @@ export type Database = {
         }[]
       }
       dashboard_overview: { Args: never; Returns: Json }
+      duplicate_vehicle: { Args: { p_id: string }; Returns: string }
       hit_rate_limit: {
         Args: { p_key: string; p_max: number; p_window_seconds: number }
         Returns: boolean
@@ -1127,6 +1128,11 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       mark_notifications_read: { Args: { p_ids: string[] }; Returns: number }
       my_role: { Args: never; Returns: Database["public"]["Enums"]["app_role"] }
+      reorder_vehicle_media: {
+        Args: { p_ids: string[]; p_vehicle: string }
+        Returns: undefined
+      }
+      save_vehicle: { Args: { p: Json }; Returns: string }
       team_members: {
         Args: never
         Returns: {

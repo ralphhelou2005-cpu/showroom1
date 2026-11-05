@@ -61,7 +61,7 @@ export default async function CarPage({ params }: Props) {
       <main id="main" tabIndex={-1}>
         <div id="car" className="car-page">
           <div className="car-top">
-            <Gallery photos={car.photos} name={car.name} sample={car.isSample} reserved={car.status === 'reserved'} />
+            <Gallery items={car.gallery} name={car.name} sample={car.isSample} reserved={car.status === 'reserved'} />
             <div className="car-head">
               <Link className="crumb" href="/inventory">All cars</Link>
               <p className="label">{car.make}</p>

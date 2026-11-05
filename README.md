@@ -213,8 +213,7 @@ The platform replaces the current site in one switch, once the owner has decided
    `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_SITE_URL` (the final address), `SUPABASE_SECRET_KEY`,
    `ANALYTICS_SALT` (32+ random characters). Optional: `RESEND_API_KEY` and `EMAIL_FROM` (an address on a domain
    verified in Resend), `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`.
-3. **Database part 14** (`submit_inquiry`, `analytics_summary`) applied to the live project, then the types
-   regenerated. Parts 1 to 13 are applied already.
+3. **The database** is ready: parts 1 to 14 are applied to the live project.
 4. **Supabase settings** for the dashboard (above), with the final address.
 5. **Try it** on the host's preview address: sign in, invite a colleague, add a car, book a viewing from a phone,
    confirm it; check Settings → Connections.

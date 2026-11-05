@@ -67,8 +67,11 @@ At the owner's request ("do it all in one phase and fast"), the last five phases
   sends, and says so when it can't). The French, Arabic and dashboard pages load under the production security
   policy without errors.
 
+**Applied to the live project (2026-11-05)**, with the owner's go-ahead: database part 14. Checked afterwards,
+without writing anything: visitors can call neither function and staff logins can't save inquiries; the owner's
+analytics summary comes back; every count as before; no new security advisor notes. Types regenerated: unchanged.
+
 **Not done yet / carried forward**
-- Database part 14 isn't applied to the live project (it waits for the owner's go-ahead, with the switch).
 - Not built: automatic WhatsApp messages (WhatsApp Business API, which also needs Meta to approve a template), copying
   viewings to Google Calendar, reminder emails before a viewing, error tracking. Settings says so; WhatsApp links and
   buttons work everywhere.

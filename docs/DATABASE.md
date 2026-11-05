@@ -7,7 +7,8 @@ untouched until the new platform replaces the site. Every rule below is tested i
 
 **Applied to the live project (`nlhjnihjvlhimmigofbx`) on 2026-11-04**, at the owner's request (no separate
 staging project), part 11 later the same day, parts 12 and 13 on 2026-11-05 (`platform_12_dashboard`,
-`platform_13_inventory_editor`), each with the owner's go-ahead. Part 14 isn't applied yet. The Supabase connector recorded them as `platform_01_foundation` … `platform_13_inventory_editor`
+`platform_13_inventory_editor`), part 14 the same evening (`platform_14_inquiries_and_analytics`), each with the
+owner's go-ahead. The Supabase connector recorded them as `platform_01_foundation` … `platform_13_inventory_editor`
 with its own version numbers, so the history differs from the file names: if the Supabase CLI is used later, run
 `supabase migration repair` once to line them up. TypeScript types for every table are in `src/types/database.ts`;
 regenerate them after each migration. Because there is no staging copy, anything that writes data is tested on
@@ -137,8 +138,7 @@ as it is with a still (`-poster.webp`). Deleting a photo, a video or a car remov
 
 ## Inquiries and analytics (part 14)
 
-Two functions; no table or data changes. **Not applied to the live project yet** (it goes with the switch, with the
-owner's go-ahead).
+Two functions; no table or data changes. Applied to the live project on 2026-11-05 with the owner's go-ahead.
 
 - `submit_inquiry(p)`: a request from the website's booking form, saved all or nothing: the customer (found again
   by phone, then email, or added), their lead (source "website form", or "viewing request" with a time, and the car
@@ -153,6 +153,12 @@ owner's go-ahead).
 
 The events themselves (`analytics_events`, from part 3) are written by the server only, with an anonymous code per
 visitor and day (README, Analytics).
+
+Checked on the live project after applying, without writing anything: visitors can call neither function and staff
+logins can't call `submit_inquiry` (all refused before running); the owner's summary comes back (all zeros, nothing
+recorded yet); 7 cars, 7 cars on the current admin page, 13 photos, 3 featured and no customers, leads, viewings,
+events or emails, as before; Supabase's security advisor shows nothing new. Types regenerated: identical to the
+ones written by hand.
 
 ## Copying the current cars
 

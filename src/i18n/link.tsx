@@ -21,8 +21,12 @@ export function localize(href: string, locale: Locale): string {
 
 type Props = Omit<ComponentProps<typeof NextLink>, 'href'> & { href: string };
 
-export function Link({ href, ...rest }: Props) {
-  return <NextLink href={localize(href, useLocale())} {...rest} />;
+/* Links to the home page don't fetch it ahead: its walk-in film (625 KB on a phone) and first picture would start
+   downloading on every other page, taking the connection from that page's own photos. It loads on the click. */
+const toHome = (href: string) => /^\/(?=[?#]|$)/.test(href);
+
+export function Link({ href, prefetch, ...rest }: Props) {
+  return <NextLink href={localize(href, useLocale())} prefetch={prefetch ?? (toHome(href) ? false : undefined)} {...rest} />;
 }
 
 /* the address without its language prefix: "/fr/inventory" reads "/inventory" */

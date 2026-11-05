@@ -60,12 +60,14 @@ function Figures({ o, role, sales }: { o: Overview; role: Role; sales: boolean }
               plural(l.new, 'new lead'), role === 'SALESPERSON' ? `${l.unassigned} to pick up` : `${l.unassigned} unassigned`,
               plural(l.won_30d, 'sale') + ' in the last 30 days',
             ].join(' · ')}
-            alert={l.due > 0 ? `${plural(l.due, 'follow-up')} due` : undefined} />
+            alert={l.due > 0 ? `${plural(l.due, 'follow-up')} due` : undefined}
+            foot={<Link href={l.due > 0 ? '/admin/leads?status=due' : '/admin/leads'}>{l.due > 0 ? 'See who to follow up' : 'See the leads'}</Link>} />
         )}
         {sales && (
           <Tile label="Viewings" value={v.next_7_days}
             note={v.next_7_days + v.to_approve === 0 ? 'None booked in the next 7 days.' : `In the next 7 days · ${v.today} today`}
-            alert={managers && v.to_approve > 0 ? `${plural(v.to_approve, 'request')} to approve` : undefined} />
+            alert={managers && v.to_approve > 0 ? `${plural(v.to_approve, 'request')} to approve` : undefined}
+            foot={<Link href='/admin/viewings'>See the diary</Link>} />
         )}
         <Tile label="Team" value={o.team.active}
           note={ROLES.filter(r => o.team.by_role[r]).map(r => o.team.by_role[r] === 1 ? `1 ${ROLE_LABEL[r].toLowerCase()}` : `${o.team.by_role[r]} ${ROLE_PLURAL[r]}`).join(' · ')}

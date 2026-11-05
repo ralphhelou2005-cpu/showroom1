@@ -28,7 +28,7 @@ export default async function NewVehiclePage() {
     <>
       <Link href="/admin/inventory" className="text-[14px] text-champagne no-underline hover:underline">← Inventory</Link>
       <h1 className="mt-4 text-[clamp(38px,6vw,64px)]">Add a car</h1>
-      <p className="mt-3 text-muted">It starts as a draft: only the team sees it until you choose to show it. Photos and videos are added once it’s created.</p>
+      <p className="mt-3 text-muted">It starts as a draft: only the team sees it until you choose to show it. Photos and videos come right after you create it.</p>
       <VehicleEditor initial={initial} brands={brands} featured={featured} canEdit canSell={manager} canDelete={false} />
     </>
   );

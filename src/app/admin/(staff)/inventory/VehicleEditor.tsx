@@ -96,7 +96,7 @@ export default function VehicleEditor({ initial, brands: brandList, featured, ca
     const r = await saveVehicle(payload);
     if (!r.ok) { setMessage({ error: r.error }); return; }
     setDirty(false);
-    if (isNew) { router.replace(`/admin/inventory/${r.id}?saved=1`); return; }
+    if (isNew) { router.replace(`/admin/inventory/${r.id}?saved=1#media`); return; }   // straight to its photos
     setMessage({ done: 'Saved. The website shows the change now.' });
     router.refresh();
   });
@@ -234,6 +234,14 @@ export default function VehicleEditor({ initial, brands: brandList, featured, ca
         </section>
 
         {children}
+        {/* a new car has no folder for its files yet: the photos come right after it is created */}
+        {isNew && canEdit && (
+          <section className={panel} aria-labelledby="media-new">
+            <h2 id="media-new" className="text-[clamp(24px,2.6vw,30px)]">Photos and videos</h2>
+            <p className="mt-3 mb-0 max-w-[60ch] text-[15px] text-muted">Each car keeps its own photos, so they’re added as soon as the car exists. Fill in the details above, then create the car: this section opens with its photo upload.</p>
+            <button type="button" className={smallBtn + ' mt-6'} onClick={save} disabled={pending}>{pending ? 'Saving…' : 'Create the car and add photos'}</button>
+          </section>
+        )}
       </fieldset>
 
       <aside className="[display:grid] gap-6 xl:sticky xl:top-8">

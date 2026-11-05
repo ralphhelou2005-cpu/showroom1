@@ -17,7 +17,7 @@
 <div class="env" aria-hidden="true"></div>
 
 <nav class="nav solid" aria-label="Admin">
-  <a class="wordmark" href="admin.html">Milcar<small>Showroom admin</small></a>
+  <a class="wordmark" href="admin.html?old">Milcar<small>Showroom admin</small></a>
   <ul>
     <li><a href="inventory" target="_blank" rel="noopener">View site</a></li>
     <li class="when-in" hidden><button class="btn ghost" type="button" id="logout">Log out</button></li>
@@ -67,10 +67,11 @@
       </div>
       <div class="a-head-actions">
         <!-- the new platform's dashboard (leads, viewings, customers, analytics), a preview until the switch -->
-        <a class="btn ghost" href="https://milcar-platform.vercel.app/admin" target="_blank" rel="noopener">New dashboard</a>
+        <a class="btn ghost" href="https://milcar-platform.vercel.app/admin">New dashboard</a>
         <a class="btn" href="#new">Add a car</a>
       </div>
     </header>
+    <p class="a-hint">This is the old car editor, kept until the switch: the cars on the website still come from here. Everything else is in the new dashboard.</p>
     <div class="a-tools">
       <label class="a-search"><span class="label">Search</span><input type="search" id="search" placeholder="Make, model, year, colour…" autocomplete="off"></label>
       <div class="filters a-filters" id="statusFilter" role="group" aria-label="Show cars that are">

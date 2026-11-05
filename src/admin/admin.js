@@ -96,7 +96,7 @@ async function logout() {
   if (editing) dropUploads();
   editing = null; me = null;
   await db.auth.signOut({ scope: 'local' }).catch(() => {});
-  history.replaceState(null, '', location.pathname);
+  history.replaceState(null, '', location.pathname + location.search);   // stays on ?old
   show('login');
 }
 $('#logout').addEventListener('click', logout);

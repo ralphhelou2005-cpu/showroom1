@@ -8,13 +8,63 @@ The live website (`main`, GitHub Pages) does not change until Phase 10, and only
 | 1 | Audit and plan | ✅ Done 2026-11-04 |
 | 2 | Architecture and database | ✅ Done 2026-11-04 |
 | 3 | Public website | ✅ Done 2026-11-04 |
-| 4 | Logins and dashboard | Next |
-| 5 | Inventory CMS | |
+| 4 | Logins and dashboard | ✅ Built and tested 2026-11-05 (database part 12 waits for the owner's go-ahead) |
+| 5 | Inventory CMS | Next |
 | 6 | CRM | |
 | 7 | Booking and WhatsApp | |
 | 8 | Languages (full French and Arabic, right to left) | |
 | 9 | Analytics, SEO and security | |
 | 10 | Testing, launch and documentation | |
+
+## Phase 4: logins and dashboard (2026-11-05)
+
+**Done**
+- **The doors** (`/admin/login`, `/admin/forgot`): sign in with email and password; a forgotten password by email.
+  Wrong details, too many attempts and switched-off logins each get a plain answer, and none reveals whether an
+  email has a login. Signed-in staff skip the login page; others are sent to it and brought back where they were.
+- **Invitations** (Team, owner only): a name, an email, a role and optionally a mobile. The server creates the
+  login, the owner's own login gives the role (so the audit log records who), and the owner gets a one-time link
+  to copy or send by WhatsApp (opened straight to that person when the mobile is given). The link opens a page with
+  a Continue button, and only the button uses it up: WhatsApp's link preview opens the link first and would
+  otherwise spend it. The person then chooses their password and lands on their overview.
+- **Roles and access** (Team, owner only): change a role, switch someone off or on (switched off, they lose
+  access at once and can't sign in again), make a new sign-in link for someone who forgot their password. The
+  owner has no controls on their own line, and the database keeps at least one owner. Everyone else sees the team
+  and what each role can do, read-only.
+- **The overview**: a greeting, then the day's figures, each under the person's own rules: cars on sale (with
+  reserved, drafts, sold), open leads (a salesperson's own), follow-ups due, viewings in the next seven days and
+  requests to approve, the team by role, and the latest changes to the cars with who made them. Managers are told
+  how many sample cars the website shows. An inventory editor sees the cars only. Empty figures say so plainly.
+- **Your account**: name, mobile, language for messages; change password (the current one is checked first).
+- Logins without a role see "No access yet"; switched-off people see that their access is off. The menu lists only
+  the pages that exist.
+- Database part 12 (two read-only functions, `team_members()` and `dashboard_overview()`), with 11 tests.
+- A local stand-in for Supabase (`e2e/fake-supabase.ts`): Auth and the data API on the in-memory database with
+  every migration, so logins, invitations and role changes are tested without touching the live project.
+
+**Checked**
+- 60 end-to-end checks in Chrome at 1440 px and 375 px (`npm run test:e2e`): every door, wrong and missing
+  details, the invitation from form to first sign-in on a phone, the link working once and surviving a preview,
+  roles changing what people see, switching off and on, new sign-in links, the forgotten-password email, account
+  changes, a login without a role, sign-out, no sideways scrolling on a phone, no browser errors.
+- 96 database tests (11 new). Production build passes.
+- The public site is unchanged: 48 picture comparisons with the current site identical on reruns (one walk-in
+  moment differed once from timing, as before; the home page's code is untouched), 26 interactions, 36 end-to-end
+  checks on a computer and a phone.
+- Found and fixed during testing: the site's own `.grid` class (the car grid) clashed with Tailwind's `grid`
+  (new screens write `[display:grid]`, noted in `globals.css`); forms emptied themselves after an error (they now
+  keep what was typed, except passwords).
+
+**Not done yet / carried forward**
+- Database part 12 is not on the live project yet: it needs the owner's go-ahead. Until then the live dashboard
+  can't show the team or the overview.
+- The dashboard isn't online: it needs hosting (decision 1) and `SUPABASE_SECRET_KEY` in the server's settings.
+- Supabase settings to make once (README, "Supabase settings the dashboard needs"): the redirect address, sign-ups
+  off, the reset-password email link.
+- Password emails reach staff only once an email service is connected (decision 4); until then the owner sends a
+  new sign-in link from Team.
+- The dashboard is in English; its French and Arabic come with Phase 8.
+- Two-step sign-in (an authenticator app) is possible with Supabase and can be added in Phase 9 if wanted.
 
 ## Phase 3: public website (2026-11-04)
 

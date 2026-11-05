@@ -31,3 +31,6 @@ next-env.d.ts
 public/engine/
 *.tsbuildinfo
 .vercel/
+
+# end-to-end test screenshots
+e2e/screens/

@@ -34,7 +34,8 @@ npm run dev                  # http://localhost:3000
 | `npm run build` | Lists the pictures, builds the walk-in engine, type-checks, then builds the site for production |
 | `npm start` | Serve that build |
 | `npm run test:db` | Every database rule, on an in-memory Postgres (no Supabase project needed) |
-| `npm run typecheck` | TypeScript only |
+| `npm run test:e2e` | The dashboard end to end in a real browser, against a local stand-in for Supabase (see Testing) |
+| `npm run typecheck` | TypeScript only (`tsconfig.check.json`: the project without the files `next dev` generates) |
 | `npm run assets` | Rewrite the list of pictures and the walk-in engine (the two commands above do it for you) |
 
 ## Where things are
@@ -50,13 +51,59 @@ npm run dev                  # http://localhost:3000
 | `src/i18n/` | The languages: routing, loading the words, and `link.tsx`, the language-aware link the pages use |
 | `src/lib/supabase/` | The ways to reach Supabase: `public` (visitors' view, cacheable), `server` and `browser` (as the logged-in member of staff, so their rules apply), `admin` (the server's own key, server only) |
 | `src/lib/env.ts`, `env.server.ts` | Settings, checked when first used. Secrets are in `env.server.ts`, which browser code cannot import |
+| `src/app/admin/` | The staff dashboard: `(auth)` holds the doors (sign in, forgotten password, the page a one-time link opens, choosing a password), `(staff)` the pages behind them (overview, team, your account) and the frame that checks the role |
+| `src/lib/staff.ts`, `src/lib/roles.ts` | Who is signed in, their role, the checks every dashboard page and action makes, the rate limits |
+| `src/components/admin/` | The dashboard's menu and form pieces, in the site's own look |
 | `src/proxy.ts` | Runs before each page: the current site's old addresses (`car.html?id=…`), the dashboard's login check, the language |
 | `src/assets/` | The pictures and fonts. Videos are in `public/assets/` |
-| `supabase/migrations/` | The database, in eleven files, applied to the live project. See [docs/DATABASE.md](docs/DATABASE.md) |
+| `supabase/migrations/` | The database, in twelve files. See [docs/DATABASE.md](docs/DATABASE.md) |
 | `src/types/database.ts` | TypeScript types for every table, generated from the live database (regenerate after each migration) |
 | `supabase/tests/` | The database tests |
+| `e2e/` | The end-to-end tests and the local stand-in for Supabase they run against (`fake-supabase.ts`), with its test logins (`fixtures/staff.json`, which exist only there) |
 | `supabase/setup.sql` | The current site's database (kept as it is) |
 | `messages/` | The words of the site in each language |
+
+## The dashboard
+
+`/admin`, for the showroom's team. Everyone signs in with an email and a password; there is no public sign-up.
+
+- **Invitations:** the owner invites people from **Team** with a name, an email and a role. The server creates
+  the login and gives the owner a one-time link to send by WhatsApp (or copy into an email). Opening it, the
+  person chooses their password. The link opens a page with a **Continue** button and only that button uses it,
+  because WhatsApp and email scanners open links to preview them.
+- **Roles and access:** the owner changes roles and switches people off and on. A switched-off person can no
+  longer see or change anything, and can't sign in again until switched back on. There is always an owner.
+- **Forgotten passwords:** **Forgot your password?** sends an email through Supabase; the owner can also make a
+  new sign-in link for anyone from **Team**, which needs no email.
+- Only pages that exist are in the menu: each later phase adds its own (inventory, customers, leads, viewings…).
+
+### Supabase settings the dashboard needs (once, in the Supabase dashboard)
+
+1. **Authentication → URL Configuration:** Site URL = the site's address; add `<site>/admin/auth/confirm` to
+   the Redirect URLs (and `http://localhost:3000/admin/auth/confirm` for your computer).
+2. **Authentication → Sign In / Providers → Email:** switch off **Allow new users to sign up** (invitations
+   don't need it).
+3. **Authentication → Emails → Reset password:** so the link also works when opened on another device, make the
+   link `{{ .SiteURL }}/admin/auth/confirm?token_hash={{ .TokenHash }}&type=recovery`.
+4. Supabase's built-in email only reaches the project's own team members, a few times an hour. Until the email
+   service is connected (Resend, Phase 7), staff who forget their password get a new link from the owner.
+5. The server needs `SUPABASE_SECRET_KEY` for invitations, new sign-in links and the platform's rate limits.
+   Without it the Team page says invitations are off; everything else works.
+
+## Testing
+
+- `npm run test:db`: every migration and access rule, on an in-memory Postgres set up like a Supabase project.
+- `npm run test:e2e`: the dashboard in a real browser (Chrome) at computer and phone sizes. It runs against
+  `e2e/fake-supabase.ts`, a stand-in for Supabase Auth and its data API built on the same in-memory database, so
+  no test ever signs in to or writes to the live project. Start the dashboard pointed at the stand-in first:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_e2e_local_only SUPABASE_SECRET_KEY=sb_secret_e2e_local_only NEXT_PUBLIC_SITE_URL=http://localhost:3300 npx next dev -p 3300
+```
+
+```bash
+npm run test:e2e
+```
 
 ## Security
 
@@ -65,5 +112,10 @@ npm run dev                  # http://localhost:3000
 - Every table has row level security. Visitors read published cars, brands, opening hours and public settings,
   nothing else. Website forms go through the server (spam check, rate limit), never straight to the database.
 - Roles (owner, manager, salesperson, inventory editor) are enforced by the database itself; see
-  [docs/DATABASE.md](docs/DATABASE.md).
+  [docs/DATABASE.md](docs/DATABASE.md). Every dashboard page and action checks the role on the server too.
+- In the dashboard the secret key only creates an invited person's login (and removes it again if the invitation
+  can't be completed), makes one-time sign-in links, blocks a switched-off person's login, and counts attempts for
+  the rate limits. Everything else runs as the signed-in person, so the database's rules and its audit log apply.
+- Sign-ins, password emails, invitations and password changes are rate limited, and no answer reveals whether an
+  email has a login.
 - `.env.local` and every `.env.*` except `.env.example` are never uploaded.

@@ -53,7 +53,8 @@ async function admin(request: NextRequest) {
     },
   });
   const { data } = await supabase.auth.getClaims();
-  const open = request.nextUrl.pathname.startsWith('/admin/login') || request.nextUrl.pathname.startsWith('/admin/auth');
+  /* the doors themselves: signing in, a forgotten password, and the page a one-time link opens */
+  const open = ['/admin/login', '/admin/forgot', '/admin/auth/'].some(p => request.nextUrl.pathname.startsWith(p));
   if (!data?.claims && !open) {
     const login = request.nextUrl.clone();
     login.pathname = '/admin/login';

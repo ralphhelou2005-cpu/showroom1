@@ -1,0 +1,32 @@
+{
+  "owner": {
+    "email": "owner@milcar.test",
+    "name": "Minas Missirian",
+    "password": "oGR6NCskhgLDpue_"
+  },
+  "manager": {
+    "email": "maya@milcar.test",
+    "name": "Maya Haddad",
+    "password": "CiyNmEn7OPCr_5p2"
+  },
+  "sales": {
+    "email": "karim@milcar.test",
+    "name": "Karim Saade",
+    "password": "jjSxmC9bl9wiH6qe"
+  },
+  "sales2": {
+    "email": "lea@milcar.test",
+    "name": "Léa Abboud",
+    "password": "TnTT7BlkzWSn-l0A"
+  },
+  "editor": {
+    "email": "nour@milcar.test",
+    "name": "Nour Khalil",
+    "password": "utdDR-tmFtdYnccq"
+  },
+  "nobody": {
+    "email": "stranger@milcar.test",
+    "name": "",
+    "password": "oyaeaYpLXlf0D17P"
+  }
+}

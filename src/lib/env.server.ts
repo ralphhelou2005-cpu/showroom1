@@ -28,6 +28,13 @@ export function serverEnv() {
   return parsed;
 }
 
+/* The server's Supabase key, or null while it isn't set. Without it the dashboard still works for everything
+   staff do with their own login; invitations and the platform's own rate limits say they are switched off. */
+export function secretKey(): string | null {
+  const key = process.env.SUPABASE_SECRET_KEY?.trim();
+  return key && key.startsWith('sb_secret_') ? key : null;
+}
+
 /* what is actually connected, for the settings page: nothing claims to work until its keys are set */
 export function integrations() {
   const e = serverEnv();

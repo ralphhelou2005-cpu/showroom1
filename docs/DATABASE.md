@@ -1,12 +1,13 @@
 # The Milcar database
 
-Supabase Postgres. The schema lives in `supabase/migrations/`, eleven files applied once each, in name order.
+Supabase Postgres. The schema lives in `supabase/migrations/`, twelve files applied once each, in name order.
 They only add things: the current website's `public.cars`, `private.admins` and `car-photos` bucket are left
 untouched until the new platform replaces the site. Every rule below is tested in `supabase/tests/`
 (`npm run test:db`), on an in-memory Postgres set up like a Supabase project.
 
 **Applied to the live project (`nlhjnihjvlhimmigofbx`) on 2026-11-04**, at the owner's request (no separate
-staging project), part 11 later the same day. The Supabase connector recorded them as `platform_01_foundation` … `platform_11_mirror_legacy_cars`
+staging project), part 11 later the same day. Part 12 (2026-11-05) is written and tested, and waits for the
+owner's go-ahead before it is applied. The Supabase connector recorded them as `platform_01_foundation` … `platform_11_mirror_legacy_cars`
 with its own version numbers, so the history differs from the file names: if the Supabase CLI is used later, run
 `supabase migration repair` once to line them up. TypeScript types for every table are in `src/types/database.ts`;
 regenerate them after each migration. Because there is no staging copy, anything that writes data is tested on
@@ -87,6 +88,19 @@ photos and specs only when they changed. When Phase 5 takes over: `alter table p
 It was needed on day one: between the copy (part 9) and Phase 3, the Range Rover was reserved and the Porsche sold
 in the current admin, and the new pages still showed them as available. Applied 2026-11-04 with the owner's
 go-ahead; the new tables then matched the current admin exactly.
+
+## What the dashboard reads (part 12)
+
+Two read-only functions; no table or data changes.
+
+- `team_members()`: the team page. Each profile, plus two facts kept with the login that the API cannot read:
+  whether the person has chosen a password yet (an invitation not yet accepted) and when they last signed in.
+  Staff see everyone with a role; the owner also sees logins without one. Visitors can't call it.
+- `dashboard_overview()`: the overview page in one request: cars on sale, reserved, sold, drafts, featured and
+  samples; open, new, unassigned and overdue leads and recent sales; viewings to approve, today and in the next
+  seven days (in the showroom's time zone); the team by role; the last eight changes to the cars and who made them.
+  It runs as the person asking, so every number follows their rules: a salesperson counts their own and unassigned
+  leads, an inventory editor sees no leads or viewings.
 
 ## Copying the current cars
 

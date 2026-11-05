@@ -37,7 +37,12 @@ const config: NextConfig = {
   /* TypeScript is checked by `tsc --noEmit` before every build (package.json), with the project's TypeScript 7 */
   typescript: { ignoreBuildErrors: true },
   async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }];
+    return [
+      { source: '/:path*', headers: securityHeaders },
+      /* the host's own addresses (previews, and the project's *.vercel.app name) stay out of search results, so they
+         never compete with the real domain */
+      { source: '/:path*', has: [{ type: 'host', value: '.*\\.vercel\\.app' }], headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }] },
+    ];
   },
 };
 

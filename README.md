@@ -51,7 +51,8 @@ npm run dev                  # http://localhost:3000
 | `src/i18n/` | The languages: routing, loading the words, and `link.tsx`, the language-aware link the pages use |
 | `src/lib/supabase/` | The ways to reach Supabase: `public` (visitors' view, cacheable), `server` and `browser` (as the logged-in member of staff, so their rules apply), `admin` (the server's own key, server only) |
 | `src/lib/env.ts`, `env.server.ts` | Settings, checked when first used. Secrets are in `env.server.ts`, which browser code cannot import |
-| `src/app/admin/` | The staff dashboard: `(auth)` holds the doors (sign in, forgotten password, the page a one-time link opens, choosing a password), `(staff)` the pages behind them (overview, team, your account) and the frame that checks the role |
+| `src/app/admin/` | The staff dashboard: `(auth)` holds the doors (sign in, forgotten password, the page a one-time link opens, choosing a password), `(staff)` the pages behind them (overview, inventory and its car editor, brands, team, your account) and the frame that checks the role |
+| `src/lib/inventory.ts`, `src/lib/vehicle-form.ts`, `src/lib/upload.ts` | What the inventory pages read; the editor's fields and their rules (shared by browser and server); preparing photos and videos before they upload |
 | `src/lib/staff.ts`, `src/lib/roles.ts` | Who is signed in, their role, the checks every dashboard page and action makes, the rate limits |
 | `src/components/admin/` | The dashboard's menu and form pieces, in the site's own look |
 | `src/proxy.ts` | Runs before each page: the current site's old addresses (`car.html?id=…`), the dashboard's login check, the language |
@@ -75,7 +76,15 @@ npm run dev                  # http://localhost:3000
   longer see or change anything, and can't sign in again until switched back on. There is always an owner.
 - **Forgotten passwords:** **Forgot your password?** sends an email through Supabase; the owner can also make a
   new sign-in link for anyone from **Team**, which needs no email.
-- Only pages that exist are in the menu: each later phase adds its own (inventory, customers, leads, viewings…).
+- **Inventory:** every car, in the website's order, with search and filters. Its editor holds the details, the text in
+  English, French and Arabic (Arabic right to left), the specs, whether it shows on the website, its status
+  (reserving and selling are for managers and the owner), whether it is one of the home page's featured cars, and its
+  photos and videos. Photos are resized in the browser before they upload; videos up to 50 MB play in the car's
+  gallery. A car can be duplicated as a draft, archived, or deleted by a manager or the owner. Every change shows on
+  the website at once.
+- **Brands:** names, the words on each brand's page, whether it shows, and the order.
+- Only pages that exist are in the menu, and only those the person's role uses: later phases add customers, leads and
+  viewings.
 
 ### Supabase settings the dashboard needs (once, in the Supabase dashboard)
 
@@ -93,7 +102,8 @@ npm run dev                  # http://localhost:3000
 ## Testing
 
 - `npm run test:db`: every migration and access rule, on an in-memory Postgres set up like a Supabase project.
-- `npm run test:e2e`: the dashboard in a real browser (Chrome) at computer and phone sizes. It runs against
+- `npm run test:e2e`: the dashboard in a real browser (Chrome) at computer and phone sizes: logins and the team
+  (`e2e/dashboard.e2e.ts`), the inventory from a new draft to the public pages (`e2e/inventory.e2e.ts`). It runs against
   `e2e/fake-supabase.ts`, a stand-in for Supabase Auth and its data API built on the same in-memory database, so
   no test ever signs in to or writes to the live project. Start the dashboard pointed at the stand-in first:
 

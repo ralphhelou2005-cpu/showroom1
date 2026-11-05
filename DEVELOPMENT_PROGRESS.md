@@ -9,12 +9,65 @@ The live website (`main`, GitHub Pages) does not change until Phase 10, and only
 | 2 | Architecture and database | ✅ Done 2026-11-04 |
 | 3 | Public website | ✅ Done 2026-11-04 |
 | 4 | Logins and dashboard | ✅ Done 2026-11-05 |
-| 5 | Inventory CMS | Next |
+| 5 | Inventory CMS | ✅ Built and tested 2026-11-05 (database part 13 waits for the owner's go-ahead) |
 | 6 | CRM | |
 | 7 | Booking and WhatsApp | |
 | 8 | Languages (full French and Arabic, right to left) | |
 | 9 | Analytics, SEO and security | |
 | 10 | Testing, launch and documentation | |
+
+## Phase 5: inventory CMS (2026-11-05)
+
+**Done**
+- **Inventory** (`/admin/inventory`): every car whatever its state, in the website's order, with search, "Shown" and
+  "Status" filters, and arrows to move a car in the order. Each line shows the main photo, year, price, number of
+  photos and videos, and tags (on the website, draft, archived, reserved, sold, featured and its position, sample).
+- **The car editor**: brand (a new brand can be added on the spot), model, version, body type, year, mileage,
+  colours, previous owners, VIN (never shown publicly), price or "Price on request", currency, photo credit, and the
+  address on the website (made from brand, model and year). The words in English, French and Arabic (Arabic written
+  right to left; anything left empty shows the English): name, tagline, description, service records, import papers,
+  search-engine title and description, each with its length limit. Specs in each language, added, ordered and
+  removed. "On the website": draft, on the website or archived; available, reserved or sold; featured on the home
+  page at a position; sample listing. Saving is all or nothing; leaving with unsaved changes asks first; on a phone
+  a save bar appears with unsaved changes.
+- **Photos and videos**: chosen or dropped, prepared in the browser (photos become a 1500 px WebP and an 800 px copy,
+  the website's own sizes; a video gets a still and its length) and uploaded straight to the media bucket as the
+  person. A description per photo in each language, the order (the first photo is the main picture), "Make main",
+  and removal (with its files). Files that aren't photos or videos, too large, or too small are refused with the
+  reason.
+- **Duplicate** a car as a draft (text and specs; not its photos or VIN), **archive** it, or **delete** it with its
+  files (managers and the owner).
+- **Brands** (`/admin/brands`): add, rename, the words on the brand's page in three languages, show or hide, order;
+  a manager or the owner deletes a brand without cars.
+- **Roles**: an inventory editor adds, edits, publishes and duplicates, but can't reserve, sell or delete; a
+  salesperson sees every car and its details without changing anything; managers and the owner do everything.
+- **The website follows at once**: every change rebuilds the public pages on their next visit. The home page's three
+  cars are now the featured ones (by position, then the next cars on show); the car page's gallery plays videos
+  with their controls. A car without videos, and the home page with its three cars, look exactly as before.
+- Cars from the current admin page carry a note: until the switch, changes made there replace these. The mirror
+  stays on until the new dashboard is in use (docs/DATABASE.md).
+- Database part 13: `save_vehicle()`, `duplicate_vehicle()`, `reorder_vehicle_media()`, and the three featured cars
+  (with their photos' descriptions). 13 new database tests.
+- The local stand-in for Supabase now also answers nested reads like the public pages make, and file storage
+  (uploads with the bucket's rules and limits, public addresses, deletes), so the whole path is tested.
+
+**Checked**
+- 50 new end-to-end checks (`e2e/inventory.e2e.ts`): a new car from draft to its public page with text in English
+  and Arabic, specs, two photos and a video (sizes, 800 px copies, still, length), the main picture, descriptions,
+  publishing, featuring (it leads the home page with its photo's description), reserving (the website's tag), the
+  history and the overview; an inventory editor (can't reserve, sell or delete; duplicates; a taken address and a
+  wrong VIN refused; adds a brand); a salesperson (sees, changes nothing); removing a video, deleting cars and their
+  files, brands, the note on cars from the current admin page; no sideways scrolling on a phone; no browser errors.
+- The 60 checks of Phase 4 still pass; 109 database tests; production build.
+- The public site against the current one: identical except the home page's three cars, which follow the featured
+  cars once part 13 is on the live project (until then the first three cars show). 26 interactions identical.
+
+**Not done yet / carried forward**
+- Database part 13 is not on the live project yet: it needs the owner's go-ahead. It also sets the three featured
+  cars and their photos' descriptions (no other data changes).
+- Equipment lists and history lines (the database has room for them beside the specs) aren't in the editor yet: the
+  car page shows specs only.
+- The mirror is switched off at the switch (Phase 10).
 
 ## Phase 4: logins and dashboard (2026-11-05)
 
@@ -194,5 +247,5 @@ Supabase connections. Advisor notes in docs/DATABASE.md.
 | 4 | Resend and Cloudflare accounts (free tiers) | Phase 7 / 9 |
 | 5 | Business details: address, map, hours, phone, WhatsApp, email, booking rules, staff, brands, About facts | Any time (they appear by themselves) |
 | 6 | A native speaker to approve the French and Arabic | Phase 8 |
-| 7 | Hide the six sample cars at launch (keep them as drafts)? | Phase 5 |
+| 7 | Hide the six sample cars at launch (keep them as drafts)? Each one is now a click in the car editor ("Draft"), once the dashboard is online | Launch |
 | 8 | Keep or remove the FAQ promises "Bring your own mechanic" and "the showroom is yours" (kept as they are for now) | Before launch |

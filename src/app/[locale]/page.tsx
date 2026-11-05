@@ -46,7 +46,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
           <FeaturedShowroom vehicles={vehicles} />
           <PromiseSection />
           <Build />
-          <InventoryTeaser />
+          <InventoryTeaser vehicles={vehicles} />
           <Process />
           <FAQ />
           <Booking />

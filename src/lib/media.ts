@@ -4,7 +4,7 @@ import { publicEnv } from './env';
 
 /* A picture as the browser needs it: the full size, the 800 px copy beside it, and both as a srcset.
    Built on the server and passed to pages as plain strings. */
-export interface Photo { src: string; small: string; set: string }
+export interface Photo { src: string; small: string; set: string; alt?: string }
 
 const small = (path: string) => path.replace(/\.(webp|jpe?g|png|avif)$/i, '-800.$1');
 

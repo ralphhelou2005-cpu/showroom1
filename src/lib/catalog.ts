@@ -2,13 +2,14 @@ import 'server-only';
 import { cache } from 'react';
 import type { Locale } from '@/i18n/routing';
 import type { Enums } from '@/types/database';
-import { mediaPhoto, type Photo } from './media';
+import { mediaPhoto, sitePhoto, storageUrl, type Photo } from './media';
 import { supabasePublic } from './supabase/public';
 
 /* The showroom's cars as the public pages show them: published, not sold, in the showroom's order, with the
    text in the visitor's language (English where a translation is missing). Read with the publishable key, so
    the database rules decide what is visible exactly as for any visitor. */
 export interface Spec { label: string; value: string }
+export type GalleryItem = ({ kind: 'image' } & Photo) | { kind: 'video'; src: string; poster: string | null };
 export interface Vehicle {
   id: string;
   slug: string;                  /* the address: /car/f8-tributo */
@@ -32,8 +33,10 @@ export interface Vehicle {
   status: Enums<'vehicle_status'>;
   isSample: boolean;
   isFeatured: boolean;
+  featuredRank: number | null;  /* its place among the featured cars on the home page */
   credit: string | null;
-  photos: Photo[];
+  photos: Photo[];               /* the photos in order, the first being the main picture (alt: its description, if written) */
+  gallery: GalleryItem[];        /* photos and videos in their order, for the car page */
   sitePhotosOnly: boolean;       /* every photo ships with the site (the stock photos of the sample cars) */
   specs: Spec[];
 }
@@ -42,7 +45,7 @@ const SELECT = `id, slug, model, variant, body_type, model_year, mileage_km, ext
   status, is_featured, featured_rank, is_sample, photo_credit, sort_order, created_at,
   brands!inner ( name, slug ),
   vehicle_translations ( locale, title, tagline, description, service_records, import_papers, seo_title, seo_description ),
-  vehicle_media ( kind, storage_bucket, storage_path, sort_order ),
+  vehicle_media ( kind, storage_bucket, storage_path, poster_path, alt, sort_order ),
   vehicle_features ( group_key, sort_order, vehicle_feature_translations ( locale, label, value ) )`;
 
 /* the text in this language, else in English */
@@ -61,7 +64,13 @@ export const listVehicles = cache(async (locale: Locale = 'en'): Promise<Vehicle
   if (error) throw new Error('catalog: could not read the vehicles (' + error.message + ')');
   return data.map(v => {
     const t = pick(v.vehicle_translations, locale);
-    const media = [...v.vehicle_media].filter(m => m.kind === 'image').sort((a, b) => a.sort_order - b.sort_order);
+    const all = [...v.vehicle_media].sort((a, b) => a.sort_order - b.sort_order);
+    const media = all.filter(m => m.kind === 'image');
+    const photo = (m: (typeof all)[number]): Photo => {
+      const alt = m.alt as Record<string, string> | null;
+      const text = alt?.[locale] || alt?.en;
+      return text ? { ...mediaPhoto(m.storage_bucket, m.storage_path), alt: text } : mediaPhoto(m.storage_bucket, m.storage_path);
+    };
     const specs = [...v.vehicle_features]
       .filter(f => f.group_key === 'specs')
       .sort((a, b) => a.sort_order - b.sort_order)
@@ -92,8 +101,13 @@ export const listVehicles = cache(async (locale: Locale = 'en'): Promise<Vehicle
       status: v.status,
       isSample: v.is_sample,
       isFeatured: v.is_featured,
+      featuredRank: v.featured_rank,
       credit: v.photo_credit,
-      photos: media.map(m => mediaPhoto(m.storage_bucket, m.storage_path)),
+      photos: media.map(photo),
+      gallery: all.map((m): GalleryItem => m.kind === 'image' ? { kind: 'image', ...photo(m) } : {
+        kind: 'video', src: m.storage_bucket ? storageUrl(m.storage_bucket, m.storage_path) : m.storage_path,
+        poster: m.poster_path ? (m.storage_bucket ? storageUrl(m.storage_bucket, m.poster_path) : sitePhoto(m.poster_path).src) : null,
+      }),
       sitePhotosOnly: media.every(m => m.storage_bucket === null),
       specs,
     };

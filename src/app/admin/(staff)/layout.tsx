@@ -42,7 +42,7 @@ export default async function StaffLayout({ children }: { children: ReactNode })
             <a href="/admin" className="font-display text-[28px] tracking-[.04em] text-ink no-underline">Milcar</a>
             <a href="/" target="_blank" rel="noopener" className="text-[13px] text-champagne no-underline hover:underline md:mt-2 md:block">View the website ↗</a>
           </div>
-          <AdminNav />
+          <AdminNav role={p.role} />
           <div className="mt-auto hidden md:block">
             <p className="text-[15px] text-ink">{displayName(p)}</p>
             <p className="mb-4 text-[13px] text-muted">{ROLE_LABEL[p.role]}</p>

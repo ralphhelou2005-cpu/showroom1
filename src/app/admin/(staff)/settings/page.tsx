@@ -9,17 +9,18 @@ import { BusinessForm, ClosureForm, HoursForm, RecipientsForm, RemoveClosure, Ru
 
 export const metadata: Metadata = { title: 'Settings' };
 
-/* what's connected, from the server's own settings: nothing claims to work until its keys are set */
-function connections() {
+/* what's connected, from the server's own settings: nothing claims to work until its keys are set, and what
+   isn't built yet says so */
+function connections(): { name: string; on: boolean; need?: string; later?: string }[] {
   const set = (k: string) => !!process.env[k]?.trim();
   return [
     { name: 'Saving inquiries, invitations, rate limits', on: !!secretKey(), need: 'SUPABASE_SECRET_KEY' },
     { name: 'Email to customers and staff (Resend)', on: emailConnected(), need: 'RESEND_API_KEY and EMAIL_FROM (an address on a domain verified in Resend)' },
     { name: 'Spam check on the website’s forms (Cloudflare Turnstile)', on: set('TURNSTILE_SECRET_KEY') && set('NEXT_PUBLIC_TURNSTILE_SITE_KEY'), need: 'NEXT_PUBLIC_TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY; until then a hidden trap field and the rate limit stop most spam' },
     { name: 'Visitor analytics', on: !!secretKey() && (process.env.ANALYTICS_SALT?.length ?? 0) >= 32, need: 'ANALYTICS_SALT (32+ random characters) and SUPABASE_SECRET_KEY' },
-    { name: 'WhatsApp Business API (automatic messages)', on: false, need: 'WHATSAPP_BUSINESS_TOKEN and WHATSAPP_PHONE_NUMBER_ID, then a template approved by Meta; the WhatsApp buttons and links work without it' },
-    { name: 'Google Calendar (copy confirmed viewings)', on: false, need: 'a Google service account (GOOGLE_CALENDAR_CLIENT_EMAIL, GOOGLE_CALENDAR_PRIVATE_KEY, GOOGLE_CALENDAR_ID)' },
-    { name: 'Error tracking (Sentry)', on: set('SENTRY_DSN'), need: 'SENTRY_DSN; until then errors are in the hosting’s logs' },
+    { name: 'WhatsApp Business API (automatic messages)', on: false, later: 'Not part of the site yet. The WhatsApp buttons and links work without it.' },
+    { name: 'Google Calendar (copy confirmed viewings)', on: false, later: 'Not part of the site yet. Viewings are in the dashboard’s diary.' },
+    { name: 'Error tracking (Sentry)', on: false, later: 'Not part of the site yet. Server errors are in the hosting’s logs.' },
   ];
 }
 
@@ -54,8 +55,8 @@ export default async function SettingsPage() {
       {owner && <section className={panel} aria-labelledby="connections"><h2 id="connections" className={h2}>Connections</h2>
         <p className="mb-6 text-[15px] text-muted">Set in the hosting’s environment settings (README, .env.example). Each one says plainly whether it works.</p>
         <ul className="m-0 list-none divide-y divide-line p-0">{connections().map(c => (
-          <li key={c.name} className="py-3"><p className="m-0 text-ink">{c.name} · <span className={c.on ? 'text-champagne-hi' : 'text-muted'}>{c.on ? 'Connected' : 'Not connected'}</span></p>
-            {!c.on && <p className="m-0 mt-1 text-[13px] text-muted">Needs {c.need}.</p>}</li>))}</ul></section>}
+          <li key={c.name} className="py-3"><p className="m-0 text-ink">{c.name} · <span className={c.on ? 'text-champagne-hi' : 'text-muted'}>{c.on ? 'Connected' : c.later ? 'Not built yet' : 'Not connected'}</span></p>
+            {!c.on && <p className="m-0 mt-1 text-[13px] text-muted">{c.later ?? `Needs ${c.need}.`}</p>}</li>))}</ul></section>}
     </>
   );
 }

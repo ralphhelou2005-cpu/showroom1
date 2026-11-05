@@ -1,4 +1,5 @@
 import { Link } from '@/i18n/link';
+import { getWords } from '@/i18n/server-words';
 import type { Vehicle } from '@/lib/catalog';
 import { sitePhoto, type Photo } from '@/lib/media';
 import { vars } from './ui';
@@ -19,19 +20,20 @@ function pick(vehicles: Vehicle[]): { slug: string; photo: Photo; name: string; 
   return [...featured, ...rest].slice(0, 3).map(v => ({ slug: v.slug, photo: v.photos[0], name: v.name, alt: v.photos[0].alt ?? v.name }));
 }
 
-export default function InventoryTeaser({ vehicles }: { vehicles: Vehicle[] | null }) {
+export default async function InventoryTeaser({ vehicles }: { vehicles: Vehicle[] | null }) {
+  const { w: { teaser: t } } = await getWords();
   const cars = vehicles ? pick(vehicles) : FALLBACK;
   return (
     <section className="teaser reveal" id="inventory">
       <div>
-        <p className="label rv">The inventory</p>
-        <h2 className="rv" style={vars({ '--i': 1 })}>Every car, with its story.</h2>
-        <p className="rv" style={vars({ '--i': 2 })}>See what's in the showroom, then ask for the history of the one you want.</p>
-        <Link className="btn rv" style={vars({ '--i': 3 })} href="/inventory">View the inventory</Link>
+        <p className="label rv">{t.label}</p>
+        <h2 className="rv" style={vars({ '--i': 1 })}>{t.title}</h2>
+        <p className="rv" style={vars({ '--i': 2 })}>{t.text}</p>
+        <Link className="btn rv" style={vars({ '--i': 3 })} href="/inventory">{t.btn}</Link>
       </div>
       <div className="teaser-cars rv" style={vars({ '--i': 2 })}>
         {cars.map(c => (
-          <Link key={c.slug} href={'/car/' + c.slug} aria-label={c.name + ' specs'}><img src={c.photo.src} srcSet={c.photo.set} sizes="(max-width:900px) 60vw, 30vw" width={1500} height={1000} alt={c.alt} loading="lazy" decoding="async" /></Link>
+          <Link key={c.slug} href={'/car/' + c.slug} aria-label={t.specs(c.name)}><img src={c.photo.src} srcSet={c.photo.set} sizes="(max-width:900px) 60vw, 30vw" width={1500} height={1000} alt={c.alt} loading="lazy" decoding="async" /></Link>
         ))}
       </div>
     </section>

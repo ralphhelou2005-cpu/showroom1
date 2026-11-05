@@ -78,9 +78,11 @@ const en = {
   car: {
     all: 'All cars', reservedLine: 'This car is reserved. Ask us to hear if it becomes available.', book: 'Book a private viewing', factory: 'Factory specs', thisCar: 'This car',
     rows: ['Year', 'Mileage', 'Color', 'Previous owners', 'Service records', 'Import papers'], ask: 'On request',
+    /* the usual spec names, for a car whose specs were written in English only */
+    specLabels: {} as Record<string, string>,
     note: 'Factory figures are for the model and can vary by year and market. Ask us to confirm them against this car’s papers.',
     next: 'Next car', photos: 'Photos:', unsplash: ' on Unsplash', km: 'km',
-    gallery: { sample: 'Sample listing', reserved: 'Reserved', photo: 'Show photo', video: 'Play video', videoOf: (name: string) => `Video of the ${name}` },
+    gallery: { sample: 'Sample listing', reserved: 'Reserved', photo: 'Show photo', video: 'Play video', videoOf: 'Video of the {name}' },
   },
   brands: { label: 'The showroom', title: 'Brands', text: 'The makers on our floor. Pick one to see its cars.', count: (n: number) => `${n} ${n === 1 ? 'car' : 'cars'} on show`, see: 'See the cars', all: 'All brands', every: (name: string) => `Every ${name} on our floor. Pick a car to see its full specs, then ask for its history.` },
   about: { label: 'About Milcar', title: 'Every car has a story.', text: 'Milcar Automotive Consultancy. Supercars and luxury cars, with the full history on the table. We show you all of it.', inventory: 'View the inventory', book: 'Book a private viewing' },
@@ -166,9 +168,10 @@ const fr: Words = {
   car: {
     all: 'Toutes les voitures', reservedLine: 'Cette voiture est réservée. Demandez-nous d’être prévenu si elle redevient disponible.', book: 'Réserver une visite privée', factory: 'Données constructeur', thisCar: 'Cette voiture',
     rows: ['Année', 'Kilométrage', 'Couleur', 'Propriétaires précédents', 'Carnet d’entretien', 'Papiers d’importation'], ask: 'Sur demande',
+    specLabels: { Engine: 'Moteur', Power: 'Puissance', Torque: 'Couple', Gearbox: 'Boîte de vitesses', Drive: 'Transmission', '0 to 100 km/h': '0 à 100 km/h', '0 to 97 km/h': '0 à 97 km/h', 'Top speed': 'Vitesse maximale' },
     note: 'Les données constructeur concernent le modèle et peuvent varier selon l’année et le marché. Demandez-nous de les vérifier avec les papiers de cette voiture.',
     next: 'Voiture suivante', photos: 'Photos :', unsplash: ' sur Unsplash', km: 'km',
-    gallery: { sample: 'Annonce d’exemple', reserved: 'Réservée', photo: 'Voir la photo', video: 'Lire la vidéo', videoOf: (name: string) => `Vidéo de la ${name}` },
+    gallery: { sample: 'Annonce d’exemple', reserved: 'Réservée', photo: 'Voir la photo', video: 'Lire la vidéo', videoOf: 'Vidéo de la {name}' },
   },
   brands: { label: 'Le showroom', title: 'Marques', text: 'Les marques présentes au showroom. Choisissez-en une pour voir ses voitures.', count: (n: number) => `${n} ${n === 1 ? 'voiture exposée' : 'voitures exposées'}`, see: 'Voir les voitures', all: 'Toutes les marques', every: (name: string) => `Toutes les ${name} du showroom. Choisissez une voiture pour voir sa fiche technique, puis demandez son historique.` },
   about: { label: 'À propos de Milcar', title: 'Chaque voiture a une histoire.', text: 'Milcar Automotive Consultancy. Supercars et voitures de luxe, avec tout leur historique sur la table. Nous vous la montrons tout entière.', inventory: 'Voir nos voitures', book: 'Réserver une visite privée' },
@@ -253,9 +256,10 @@ const ar: Words = {
   car: {
     all: 'كل السيارات', reservedLine: 'هذه السيارة محجوزة. اطلب منّا أن نُعلمك إن أصبحت متاحة.', book: 'احجز معاينة خاصة', factory: 'مواصفات المصنع', thisCar: 'هذه السيارة',
     rows: ['السنة', 'المسافة المقطوعة', 'اللون', 'المالكون السابقون', 'سجلّ الصيانة', 'أوراق الاستيراد'], ask: 'عند الطلب',
+    specLabels: { Engine: 'المحرّك', Power: 'القوة', Torque: 'عزم الدوران', Gearbox: 'ناقل الحركة', Drive: 'الدفع', '0 to 100 km/h': 'من 0 إلى 100 كم/س', '0 to 97 km/h': 'من 0 إلى 97 كم/س', 'Top speed': 'السرعة القصوى' },
     note: 'أرقام المصنع تخصّ الطراز وقد تختلف حسب السنة والسوق. اطلب منّا مطابقتها مع أوراق هذه السيارة.',
     next: 'السيارة التالية', photos: 'الصور:', unsplash: ' على Unsplash', km: 'كم',
-    gallery: { sample: 'إعلان تجريبي', reserved: 'محجوزة', photo: 'اعرض الصورة', video: 'شغّل الفيديو', videoOf: (name: string) => `فيديو ${name}` },
+    gallery: { sample: 'إعلان تجريبي', reserved: 'محجوزة', photo: 'اعرض الصورة', video: 'شغّل الفيديو', videoOf: 'فيديو {name}' },
   },
   brands: { label: 'المعرض', title: 'العلامات', text: 'العلامات الموجودة في معرضنا. اختر واحدة لترى سياراتها.', count: (n: number) => (n === 1 ? 'سيارة واحدة معروضة' : n === 2 ? 'سيارتان معروضتان' : `${n} سيارات معروضة`), see: 'شاهد السيارات', all: 'كل العلامات', every: (name: string) => `كل سيارات ${name} في معرضنا. اختر سيارة لترى مواصفاتها الكاملة، ثم اطلب تاريخها.` },
   about: { label: 'عن ميلكار', title: 'لكل سيارة قصة.', text: 'ميلكار للاستشارات في عالم السيارات. سيارات خارقة وفاخرة، بتاريخها الكامل على الطاولة. ونحن نُريك إياها كاملة.', inventory: 'شاهد سياراتنا', book: 'احجز معاينة خاصة' },

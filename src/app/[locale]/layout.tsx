@@ -3,9 +3,11 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import Analytics from '@/components/Analytics';
 import Nav from '@/components/Nav';
 import PageChrome from '@/components/PageChrome';
 import { dir, routing } from '@/i18n/routing';
+import { WORDS } from '@/i18n/words';
 import { fontVariables } from '../fonts';
 import '../globals.css';
 
@@ -30,10 +32,11 @@ export default async function LocaleLayout({ children, params }: Props) {
   return (
     <html lang={locale} dir={dir(locale)} className={fontVariables} data-scroll-behavior="smooth">
       <body>
-        <a className="skip" href="#main">Skip to content</a>
+        <a className="skip" href="#main">{WORDS[locale].common.skip}</a>
         <PageChrome />
-        <Nav />
+        <Nav t={WORDS[locale].nav} />
         {children}
+        <Analytics />
       </body>
     </html>
   );

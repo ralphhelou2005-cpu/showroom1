@@ -3,10 +3,16 @@
    Finished, the colour picker paints it. Works with mouse, touch and keyboard (space or enter). */
 const BASE = '/';   /* the videos are served from public/assets */
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
-const STAGES = ['Carbon frame', 'Engine', 'Wheels and brakes', 'Bodywork', 'Paint'];
+/* the stage words, in the page's language (src/components/Build.tsx puts them on the section) */
+const words = (section: HTMLElement) => ({
+  parts: (section.dataset.parts || 'Carbon frame|Engine|Wheels and brakes|Bodywork|Paint').split('|'),
+  stage: section.dataset.stage || 'Stage {n} of 5: {part}',
+  done: section.dataset.done || 'Finished. Pick a color.',
+});
 const HOLD_SECONDS = 11, BACK_SECONDS = 5;
 
 export function startBuild(section: HTMLElement): () => void {
+  const t = words(section);
   const $ = <T extends Element = HTMLElement>(s: string) => section.querySelector(s) as T;
   const $$ = <T extends Element = HTMLElement>(s: string) => [...section.querySelectorAll(s)] as T[];
   const SMALL = matchMedia('(max-width: 820px), (pointer: coarse)').matches;
@@ -50,7 +56,7 @@ export function startBuild(section: HTMLElement): () => void {
     if (s !== lastStage) {
       lastStage = s;
       partEls.forEach((el, i) => el.classList.toggle('on', i <= s));
-      holdState.textContent = `Stage ${s + 1} of 5: ${STAGES[s]}`;
+      holdState.textContent = t.stage.replace('{n}', String(s + 1)).replace('{part}', t.parts[s]);
     }
     let best = 0; stills.forEach((el, i) => { if (bp + .001 >= +el.dataset.at!) best = i; });
     stills.forEach((el, i) => el.classList.toggle('on', i === best));
@@ -71,7 +77,7 @@ export function startBuild(section: HTMLElement): () => void {
     built = true; holding = false;
     controls.classList.add('built'); bay.classList.add('built');
     setColor('red');
-    holdState.textContent = 'Finished. Pick a color.';
+    holdState.textContent = t.done;
   }
   function setColor(c: string) {
     paints.forEach(p => p.classList.toggle('on', p.dataset.color === c));

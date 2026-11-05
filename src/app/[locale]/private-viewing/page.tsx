@@ -4,21 +4,26 @@ import Booking from '@/components/Booking';
 import Footer from '@/components/Footer';
 import type { Locale } from '@/i18n/routing';
 import { pageMeta } from '@/lib/seo';
+import { WORDS } from '@/i18n/words';
 
-const d = 'Book a private viewing at Milcar: see the car and its papers side by side, before anyone talks about price.';
-export const metadata: Metadata = pageMeta({ title: 'Private viewing | Milcar', description: d, path: '/private-viewing' });
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const m = WORDS[locale].meta.viewing;
+  return pageMeta({ title: m.title, description: m.description, path: '/private-viewing', locale });
+}
 
 /* /private-viewing: the booking form on its own page (available times and confirmation arrive in Phase 7) */
 export default async function PrivateViewingPage({ params }: { params: Promise<{ locale: Locale }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  const t = WORDS[locale].viewing;
   return (
     <>
       <main id="main" tabIndex={-1}>
         <header className="inv-hero">
-          <p className="label">Private viewing</p>
-          <h1>See the car and its papers.</h1>
-          <p>Together, side by side, before anyone talks about price.</p>
+          <p className="label">{t.label}</p>
+          <h1>{t.title}</h1>
+          <p>{t.text}</p>
         </header>
         <Booking />
       </main>

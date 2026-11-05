@@ -1,8 +1,9 @@
-import { createHash } from 'node:crypto';
 import { NextResponse, type NextRequest } from 'next/server';
 import { z } from 'zod';
 import { secretKey } from '@/lib/env.server';
+import { clientIp } from '@/lib/staff';
 import { supabaseAdmin } from '@/lib/supabase/admin';
+import { visitorHash } from '@/lib/visitor';
 
 /* The website's own analytics, without cookies: each event is stored with an anonymous code made from the day,
    the visitor's address and browser and a secret, so a visitor counts once a day and can't be followed from one
@@ -19,17 +20,14 @@ const event = z.object({
 const BOTS = /bot|crawl|spider|slurp|preview|facebookexternalhit|lighthouse|pingdom|monitor/i;
 
 export async function POST(request: NextRequest) {
-  const salt = process.env.ANALYTICS_SALT ?? '';
-  if (!secretKey() || salt.length < 32) return new NextResponse(null, { status: 204 });
+  if (!secretKey() || (process.env.ANALYTICS_SALT?.length ?? 0) < 32) return new NextResponse(null, { status: 204 });
   const ua = request.headers.get('user-agent') ?? '';
   if (!ua || BOTS.test(ua)) return new NextResponse(null, { status: 204 });
   let body: unknown;
   try { body = JSON.parse(await request.text()); } catch { return new NextResponse(null, { status: 400 }); }
   const p = event.safeParse(body);
   if (!p.success) return new NextResponse(null, { status: 400 });
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || request.headers.get('x-real-ip') || 'local';
-  const day = new Date().toISOString().slice(0, 10);
-  const visitor = createHash('sha256').update(`${salt}|${day}|${ip}|${ua}`).digest('hex');
+  const visitor = visitorHash(await clientIp(), ua);
   const device = /ipad|tablet/i.test(ua) ? 'tablet' : /mobi|android|iphone/i.test(ua) ? 'mobile' : 'desktop';
   const country = request.headers.get('x-vercel-ip-country');
   const own = request.nextUrl.hostname;

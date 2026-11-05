@@ -28,6 +28,9 @@ export async function open(view: 'computer' | 'phone' = 'computer'): Promise<{ c
     if (m.type() !== 'error' || /favicon|Failed to load resource: the server responded with a status of 40[134]/.test(t)) return;
     /* development only: the home page's walk-in starts before React (Phase 3), so React notes the attributes it changed */
     if (t.includes('A tree hydrated but some attributes') && t.includes('<HomePage>')) return;
+    /* development only: arriving at the home page from another page, React notes that the page's engine script
+       (public/engine/home.js) won't run; that is on purpose, HomeEngine starts the walk-in instead */
+    if (t.startsWith('Encountered a script tag while rendering React component')) return;
     errors.push(t);
   });
   page.on('pageerror', e => errors.push(String(e)));

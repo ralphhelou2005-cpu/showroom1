@@ -196,7 +196,7 @@ export default function VehicleEditor({ initial, brands: brandList, featured, ca
             <h2 id="text" className="text-[clamp(24px,2.6vw,30px)]">The words</h2>
             <LanguageTabs lang={lang} setLang={setLang} filled={l => TEXT_FIELDS.some(f => t[l][f].trim())} />
           </div>
-          {lang !== 'en' && <p className="mb-6 text-[14px] text-muted">Anything left empty in {LOCALE_LABEL[lang]} shows the English instead. The French and Arabic pages open with Phase 8.</p>}
+          {lang !== 'en' && <p className="mb-6 text-[14px] text-muted">Anything left empty in {LOCALE_LABEL[lang]} shows the English instead (the usual spec names, like Engine, are translated for you).</p>}
           <div className="[display:grid] gap-6" dir={rtl ? 'rtl' : 'ltr'} lang={lang}>
             {TEXT_FIELDS.map(f => (
               <Field key={f} label={FIELD_LABEL[f]} hint={FIELD_HINT[f]} count={`${t[lang][f].length} / ${TEXT_LIMIT[f]}`}>

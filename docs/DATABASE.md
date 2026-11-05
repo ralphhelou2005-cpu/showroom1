@@ -1,13 +1,13 @@
 # The Milcar database
 
-Supabase Postgres. The schema lives in `supabase/migrations/`, thirteen files applied once each, in name order.
+Supabase Postgres. The schema lives in `supabase/migrations/`, fourteen files applied once each, in name order.
 They only add things: the current website's `public.cars`, `private.admins` and `car-photos` bucket are left
 untouched until the new platform replaces the site. Every rule below is tested in `supabase/tests/`
 (`npm run test:db`), on an in-memory Postgres set up like a Supabase project.
 
 **Applied to the live project (`nlhjnihjvlhimmigofbx`) on 2026-11-04**, at the owner's request (no separate
 staging project), part 11 later the same day, parts 12 and 13 on 2026-11-05 (`platform_12_dashboard`,
-`platform_13_inventory_editor`), each with the owner's go-ahead. The Supabase connector recorded them as `platform_01_foundation` … `platform_13_inventory_editor`
+`platform_13_inventory_editor`), each with the owner's go-ahead. Part 14 isn't applied yet. The Supabase connector recorded them as `platform_01_foundation` … `platform_13_inventory_editor`
 with its own version numbers, so the history differs from the file names: if the Supabase CLI is used later, run
 `supabase migration repair` once to line them up. TypeScript types for every table are in `src/types/database.ts`;
 regenerate them after each migration. Because there is no staging copy, anything that writes data is tested on
@@ -135,6 +135,25 @@ Photos and videos are uploaded by the browser straight to the `media` bucket, as
 decide), under `vehicles/<car id>/`: each photo as a 1500 px WebP with an 800 px copy beside it (`-800`), each video
 as it is with a still (`-poster.webp`). Deleting a photo, a video or a car removes its files too.
 
+## Inquiries and analytics (part 14)
+
+Two functions; no table or data changes. **Not applied to the live project yet** (it goes with the switch, with the
+owner's go-ahead).
+
+- `submit_inquiry(p)`: a request from the website's booking form, saved all or nothing: the customer (found again
+  by phone, then email, or added), their lead (source "website form", or "viewing request" with a time, and the car
+  when the form came from a car page) and, when they chose a time, the viewing, requested or confirmed straight away
+  depending on the booking rules. The time goes through the same checks as any booking (opening hours, closures,
+  notice, how many at once), and their `booking.*` errors tell the form what to say. Only the server can call it
+  (`service_role`), after its trap field, rate limits and spam check; visitors and staff can't.
+- `analytics_summary(days)`: the Analytics page for the last 7, 30 or 90 days: visitors, pages, cars seen, taps on
+  WhatsApp and phone, each day (in the showroom's time zone), the most seen cars, where visitors came from, their
+  devices, new and won leads and where leads came from. It runs as the person asking, and only managers and the owner
+  may read the website's events, so others get zeros.
+
+The events themselves (`analytics_events`, from part 3) are written by the server only, with an anonymous code per
+visitor and day (README, Analytics).
+
 ## Copying the current cars
 
 `20261104100800_copy_legacy_cars.sql` copies `public.cars` into the new tables without changing it: same
@@ -159,5 +178,6 @@ Never to the live project without a backup and the owner's go-ahead.
   `mark_notifications_read` only touches the caller's own messages.
 - Security, the owner's setting: leaked-password protection is off (Supabase > Authentication > settings).
 - Performance: seven tables give staff two read rules where one would do (the inventory, settings, hours and
-  closures "write" rules also cover reading). Harmless at this size; Phase 9 replaces them with separate
-  insert / update / delete rules. "Unused index" notes are normal for a new database.
+  closures "write" rules also cover reading). Harmless at this size. Splitting them into separate insert / update /
+  delete rules means dropping the old ones, which the Supabase connector refuses, so it is a later migration run
+  from the SQL editor. "Unused index" notes are normal for a new database.

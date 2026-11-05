@@ -1,3 +1,4 @@
+import { getWords } from '@/i18n/server-words';
 import { asset } from '@/lib/media';
 import { vars } from './ui';
 
@@ -25,25 +26,26 @@ const filmHtml = () =>
   '<div class="sweep" id="sweep"></div><i class="lb lb-t"></i><i class="lb lb-b"></i>';
 
 /* The walk-in. This is only the markup: src/lib/home.ts drives it as the page scrolls. */
-export default function Hero() {
+export default async function Hero() {
+  const { w: { hero: t } } = await getWords();
   return (
     <div id="top" className="hero">
       <div className="stage" id="stage">
         <div className="film-wrap" id="filmWrap" aria-hidden="true" dangerouslySetInnerHTML={{ __html: filmHtml() }} />
         <div className="scrim" aria-hidden="true" />
-        <div className="band b1" data-a="0" data-b=".24" style={vars({ opacity: 1, '--k': 1 })}><p>Milcar. Come inside.</p></div>
-        <div className="band b2" data-a=".26" data-b=".48"><p>Every car has a story.</p></div>
-        <div className="band b3" data-a=".5" data-b=".7"><p><span className="soft" aria-hidden="true">We show you all of it.</span><span className="sharp">We show you all of it.</span></p></div>
-        <div className="band b4" data-a=".72" data-b="1"><Split text="Book a private viewing." seed={11} /><a className="btn" href="#book">Book now</a></div>
-        <div className="cue label" id="cue" aria-hidden="true">Scroll to walk in</div>
+        <div className="band b1" data-a="0" data-b=".24" style={vars({ opacity: 1, '--k': 1 })}><p>{t.b1}</p></div>
+        <div className="band b2" data-a=".26" data-b=".48"><p>{t.b2}</p></div>
+        <div className="band b3" data-a=".5" data-b=".7"><p><span className="soft" aria-hidden="true">{t.b3}</span><span className="sharp">{t.b3}</span></p></div>
+        <div className="band b4" data-a=".72" data-b="1"><Split text={t.b4} seed={11} /><a className="btn" href="#book">{t.now}</a></div>
+        <div className="cue label" id="cue" aria-hidden="true">{t.cue}</div>
         <svg className="loader" id="ring" viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="20" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="126" style={{ strokeDashoffset: 'var(--ld,126)' }} /></svg>
       </div>
       <div className="static-hero">
-        <div className="static-photo" role="img" aria-label="The Milcar showroom at night, its cars lit behind the glass" />
+        <div className="static-photo" role="img" aria-label={t.staticAlt} />
         <div className="static-copy">
-          <h1>Every car has a story. We show you all of it.</h1>
-          <p>Milcar Automotive Consultancy. Supercars and luxury cars, with the full history on the table.</p>
-          <a className="btn" href="#book">Book a private viewing</a>
+          <h1>{t.staticTitle}</h1>
+          <p>{t.staticText}</p>
+          <a className="btn" href="#book">{t.staticBtn}</a>
         </div>
       </div>
     </div>

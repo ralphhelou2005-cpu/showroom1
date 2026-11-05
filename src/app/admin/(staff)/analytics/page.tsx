@@ -25,6 +25,10 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
   const s = data as unknown as Summary | null;
   const recording = !!secretKey() && (process.env.ANALYTICS_SALT?.length ?? 0) >= 32;
   const max = Math.max(1, ...(s?.by_day ?? []).map(d => d.visitors));
+  /* every day of the period, the quiet ones too, so one busy day is one bar and not the whole chart */
+  const seen = new Map((s?.by_day ?? []).map(d => [d.day, d]));
+  const beirut = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Beirut' });
+  const chart = Array.from({ length: days }, (_, i) => beirut.format(Date.now() - (days - 1 - i) * 86_400_000)).map(day => seen.get(day) ?? { day, visitors: 0, views: 0 });
   const tile = (label: string, value: number, note?: string) => (
     <div className="rounded-3xl bg-panel px-6 py-5 shadow-[inset_0_0_0_1px_var(--line)]"><p className="label m-0">{label}</p><p className="m-0 mt-2 font-body text-[44px] leading-none font-extralight">{value}</p>{note && <p className="m-0 mt-2 text-[13px] text-muted">{note}</p>}</div>
   );
@@ -40,7 +44,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
       {!recording && <p className="mt-6 max-w-[70ch] rounded-2xl px-5 py-3 text-[15px] text-champagne-hi shadow-[inset_0_0_0_1px_var(--line-strong)]">Visits aren’t being recorded yet: the server needs ANALYTICS_SALT and SUPABASE_SECRET_KEY (Settings → Connections). Leads are counted already.</p>}
       {error || !s ? <p role="alert" className="mt-8 text-muted">The figures couldn’t be loaded just now.</p> : <>
         <div className="mt-8 [display:grid] gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {tile('Visitors', s.visitors, `${s.page_views} pages seen`)}
+          {tile('Visitors', s.visitors, `${s.page_views} page${s.page_views === 1 ? '' : 's'} seen`)}
           {tile('Cars seen', s.vehicle_views)}
           {tile('Taps on WhatsApp or phone', s.whatsapp_clicks + s.phone_clicks, `${s.whatsapp_clicks} WhatsApp · ${s.phone_clicks} phone`)}
           {tile('New leads', s.new_leads, `${s.leads_won} won in these ${s.days} days`)}
@@ -48,7 +52,7 @@ export default async function AnalyticsPage({ searchParams }: { searchParams: Pr
         <section className="mt-12" aria-labelledby="days"><h2 id="days" className="mb-4 text-[clamp(24px,2.6vw,30px)]">Visitors each day</h2>
           {s.by_day.length === 0 ? <p className="text-muted">No visits recorded in these {s.days} days.</p> : (
             <ol className="m-0 flex h-40 list-none items-end gap-1 p-0" aria-label="Visitors per day">
-              {s.by_day.map(d => <li key={d.day} title={`${d.day}: ${d.visitors} visitors, ${d.views} pages`} className="min-w-[4px] flex-1 rounded-t bg-champagne/70" style={{ height: `${Math.max(4, (d.visitors / max) * 100)}%` }}><span className="sr-only">{d.day}: {d.visitors} visitors</span></li>)}
+              {chart.map(d => <li key={d.day} title={`${d.day}: ${d.visitors} visitor${d.visitors === 1 ? '' : 's'}, ${d.views} page${d.views === 1 ? '' : 's'}`} className={'min-w-[2px] flex-1 rounded-t ' + (d.visitors ? 'bg-champagne/70' : 'bg-line')} style={{ height: `${d.visitors ? Math.max(4, (d.visitors / max) * 100) : 2}%` }}>{d.visitors > 0 && <span className="sr-only">{d.day}: {d.visitors} visitor{d.visitors === 1 ? '' : 's'}</span>}</li>)}
             </ol>)}
         </section>
         <div className="mt-12 [display:grid] gap-10 lg:grid-cols-3">

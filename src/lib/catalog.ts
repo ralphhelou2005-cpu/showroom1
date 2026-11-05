@@ -1,6 +1,7 @@
 import 'server-only';
 import { cache } from 'react';
 import type { Locale } from '@/i18n/routing';
+import { WORDS } from '@/i18n/words';
 import type { Enums } from '@/types/database';
 import { mediaPhoto, sitePhoto, storageUrl, type Photo } from './media';
 import { supabasePublic } from './supabase/public';
@@ -76,7 +77,7 @@ export const listVehicles = cache(async (locale: Locale = 'en'): Promise<Vehicle
       .sort((a, b) => a.sort_order - b.sort_order)
       .map(f => pick(f.vehicle_feature_translations, locale))
       .filter((s): s is NonNullable<typeof s> => !!s)
-      .map(s => ({ label: s.label, value: s.value }));
+      .map(s => ({ label: s.locale === locale ? s.label : WORDS[locale].car.specLabels[s.label] ?? s.label, value: s.value }));
     const model = v.variant ? `${v.model} ${v.variant}` : v.model;
     return {
       id: v.id,

@@ -10,11 +10,72 @@ The live website (`main`, GitHub Pages) does not change until Phase 10, and only
 | 3 | Public website | ✅ Done 2026-11-04 |
 | 4 | Logins and dashboard | ✅ Done 2026-11-05 |
 | 5 | Inventory CMS | ✅ Done 2026-11-05 |
-| 6 | CRM | |
-| 7 | Booking and WhatsApp | |
-| 8 | Languages (full French and Arabic, right to left) | |
-| 9 | Analytics, SEO and security | |
-| 10 | Testing, launch and documentation | |
+| 6 | CRM | ✅ Done 2026-11-05 |
+| 7 | Booking and WhatsApp | ✅ Done 2026-11-05 (WhatsApp links; the Business API isn't built) |
+| 8 | Languages (full French and Arabic, right to left) | ✅ Done 2026-11-05 (a native speaker should read them) |
+| 9 | Analytics, SEO and security | ✅ Done 2026-11-05 |
+| 10 | Testing, launch and documentation | Tested and documented; the launch waits for the owner's decisions below |
+
+## Phases 6 to 10, together (2026-11-05)
+
+At the owner's request ("do it all in one phase and fast"), the last five phases were built and tested as one.
+
+**Done**
+- **Leads** (`/admin/leads`): every inquiry with filters (status, source, who has it, follow-ups due, search) and a
+  CSV of what is shown; a lead page with the customer (call and WhatsApp buttons), the car, status, who has it, the
+  next follow-up, notes, a history of calls and messages (logging a call moves a new lead to "Contacted"), and its
+  viewings, booked from there. Staff add leads from a call or a visit.
+- **Viewings** (`/admin/viewings`): a diary (to approve, each day ahead, the last 30 days); confirm (managers and the
+  owner), move, done, didn't come, cancel with a reason. The customer is emailed once email is connected.
+- **Customers** (`/admin/customers`): the list with a CSV, and each customer's details, leads and viewings.
+- **Settings** (`/admin/settings`): the showroom's details (they appear on the website as soon as they are saved;
+  nothing shows while they are empty), opening hours, closed days, booking rules, who gets the new-inquiry emails, and
+  for the owner what is connected. WhatsApp Business, Google Calendar and error tracking say plainly that they aren't
+  built yet.
+- **The booking form works**: on the server (trap field, rate limits, Turnstile once connected), saved in one step by
+  the database (`submit_inquiry`, part 14), the team emailed, and the visitor told plainly what happens next. Free
+  times appear once opening hours are set. The form keeps what was typed after an error. Without the server key it
+  says it isn't connected and offers WhatsApp, instead of pretending (the current site's form sends nothing).
+- **Email** through Resend once its two settings are set; every email is recorded as sent, failed or not sent.
+- **French and Arabic**: every word of the public site in three languages (`src/i18n/words.ts`), `/fr` and `/ar`,
+  language links in the footer, the page titles and descriptions per language with their alternates. Arabic right
+  to left (`src/styles/rtl.css`) with Amiri and IBM Plex Sans Arabic, downloaded only for Arabic letters; English car
+  text, specs and phone numbers read left to right inside it; the usual spec names translate themselves.
+- **Analytics** without cookies (`/admin/analytics`, managers and the owner): visitors, pages and cars seen, taps on
+  WhatsApp and phone, each day, the most seen cars, where visitors and leads came from.
+- **Search engines**: `/sitemap.xml` (every page and car in three languages), `/robots.txt`, the business and each
+  car described for search results.
+- **Security**: a content security policy in production; the booking form behind the server; `submit_inquiry` for the
+  server only.
+- **Backups**: a nightly encrypted copy of the database by GitHub Actions, once its two secrets are set (README).
+- Database part 14 with 8 tests (117 in all). Phone numbers show as people write them (+961 1 234 567).
+- **Fixed on the way**: once three languages were routed, the nav's underline for the page you're on went missing
+  from the built English pages (they are built at `/en/…` and the nav didn't recognise that address); caught by the
+  picture comparison.
+- **Docs**: README (dashboard, booking, languages, analytics, search engines, backups, security, going live),
+  docs/DATABASE.md part 14, `.env.example` (only settings the code reads).
+
+**Checked**
+- 41 new end-to-end checks (`e2e/crm.e2e.ts`): the booking form without and with opening hours (a phone without its
+  country code refused, the lead and customer saved with the car, the team's email recorded as not sent, a robot
+  thanked and nothing saved, a time chosen and requested), settings, the contact page and footer showing the
+  details, approving a viewing, leads (notes, history, assigning, follow-ups, status), customers, both CSV files, a
+  salesperson's limits, analytics, the French and Arabic pages (phone width, no sideways scrolling) and the sitemap.
+- The 60 checks of Phase 4 and the 50 of Phase 5 still pass; 117 database tests; production build.
+- The English site against the current one: all 48 picture comparisons identical, the walk-in handover and the
+  platform smoke test pass, and of the 26 interactions only the booking form differs, on purpose (it now really
+  sends, and says so when it can't). The French, Arabic and dashboard pages load under the production security
+  policy without errors.
+
+**Not done yet / carried forward**
+- Database part 14 isn't applied to the live project (it waits for the owner's go-ahead, with the switch).
+- Not built: automatic WhatsApp messages (WhatsApp Business API, which also needs Meta to approve a template), copying
+  viewings to Google Calendar, reminder emails before a viewing, error tracking. Settings says so; WhatsApp links and
+  buttons work everywhere.
+- Splitting the seven staff "write" rules that also cover reading (docs/DATABASE.md, advisors): a later migration run
+  from the SQL editor.
+- Equipment lists and history lines in the car editor (from Phase 5).
+- The launch itself: the decisions below, then README → Going live.
 
 ## Phase 5: inventory CMS (2026-11-05)
 
@@ -246,11 +307,11 @@ Supabase connections. Advisor notes in docs/DATABASE.md.
 
 | # | Decision | Needed by |
 |---|---|---|
-| 1 | Vercel Pro (about $20/month; the free plan forbids commercial use) or a free alternative | Phase 4 (a preview link to try it) |
-| 2 | ~~A staging project~~ (owner chose the existing project, 2026-11-04). Supabase Pro (about $25/month) for daily backups before launch | Launch |
-| 3 | The domain | Phase 7 |
-| 4 | Resend and Cloudflare accounts (free tiers) | Phase 7 / 9 |
+| 1 | Vercel Pro (about $20/month; the free plan forbids commercial use) or a free alternative | Launch (a preview link to try it first) |
+| 2 | ~~A staging project~~ (owner chose the existing project, 2026-11-04). Supabase Pro (about $25/month) for daily backups, or the nightly GitHub backup alone | Launch |
+| 3 | The domain | Launch |
+| 4 | Resend (emails) and Cloudflare Turnstile (spam check) accounts, free tiers; both optional | Launch |
 | 5 | Business details: address, map, hours, phone, WhatsApp, email, booking rules, staff, brands, About facts | Any time (they appear by themselves) |
-| 6 | A native speaker to approve the French and Arabic | Phase 8 |
+| 6 | A native speaker to approve the French and Arabic | Before launch |
 | 7 | Hide the six sample cars at launch (keep them as drafts)? Each one is now a click in the car editor ("Draft"), once the dashboard is online | Launch |
 | 8 | Keep or remove the FAQ promises "Bring your own mechanic" and "the showroom is yours" (kept as they are for now) | Before launch |

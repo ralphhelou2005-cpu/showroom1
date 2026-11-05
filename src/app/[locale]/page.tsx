@@ -12,18 +12,19 @@ import InventoryTeaser from '@/components/InventoryTeaser';
 import PromiseSection from '@/components/Promise';
 import Process from '@/components/Process';
 import type { Locale } from '@/i18n/routing';
-import { listVehicles, type Vehicle } from '@/lib/catalog';
-import { HOME_TITLE, pageMeta } from '@/lib/seo';
+import { getBusiness, listVehicles, type Vehicle } from '@/lib/catalog';
+import { pageMeta } from '@/lib/seo';
+import { WORDS } from '@/i18n/words';
+import { businessJsonLd } from '@/lib/structured-data';
 
 /* rebuilt in the background at most every five minutes, so window prices follow the inventory */
 export const revalidate = 300;
 
-export const metadata: Metadata = pageMeta({
-  title: HOME_TITLE,
-  description: 'Milcar Automotive Consultancy. Walk into the showroom, see the whole car and its whole past, and book a private viewing.',
-  shareText: 'Every car has a story. We show you all of it.',
-  path: '/',
-});
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const m = WORDS[locale].meta.home;
+  return pageMeta({ title: m.title, description: m.description, shareText: m.share, path: '/', locale });
+}
 
 /* the home page: the walk-in, then the website rising over it as one panel */
 export default async function HomePage({ params }: { params: Promise<{ locale: Locale }> }) {
@@ -37,6 +38,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
   preload('/assets/walk/fast-phone.mp4', { as: 'fetch', crossOrigin: 'anonymous', media: '(max-aspect-ratio: 7/10)' });
   let vehicles: Vehicle[] | null = null;
   try { vehicles = await listVehicles(locale); } catch { /* the windows fall back to their own names */ }
+  const business = await getBusiness().catch(() => null);
   return (
     <>
       <main id="main" tabIndex={-1}>
@@ -52,6 +54,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: L
           <Booking />
           <Footer home />
         </div>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: businessJsonLd(business, locale) }} />
         <HomeEngine />
         {/* starts the walk-in as soon as this HTML is in, without waiting for the rest of the site's code */}
         <script src="/engine/home.js" defer />

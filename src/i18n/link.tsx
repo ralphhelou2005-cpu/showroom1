@@ -29,11 +29,12 @@ export function Link({ href, prefetch, ...rest }: Props) {
   return <NextLink href={localize(href, useLocale())} prefetch={prefetch ?? (toHome(href) ? false : undefined)} {...rest} />;
 }
 
-/* the address without its language prefix: "/fr/inventory" reads "/inventory" */
+/* the address without its language prefix: "/fr/inventory" reads "/inventory". English pages are built at their
+   inner address ("/en/inventory") and served at the plain one, so the prefix is dropped wherever it shows. */
 export function usePathname(): string {
   const path = useNextPathname() || '/';
   const locale = useLocale();
-  if (locale === routing.defaultLocale) return path;
+  if (path !== '/' + locale && !path.startsWith('/' + locale + '/')) return path;
   const rest = path.slice(locale.length + 1);
   return rest === '' ? '/' : rest;
 }

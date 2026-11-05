@@ -8,6 +8,7 @@
 @layer theme, site, base, components, utilities;
 @import 'tailwindcss/theme.css' layer(theme);
 @import '../styles/site.css' layer(site);
+@import '../styles/rtl.css' layer(site);
 @import 'tailwindcss/utilities.css' layer(utilities);
 
 @theme inline {

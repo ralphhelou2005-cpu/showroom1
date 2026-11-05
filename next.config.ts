@@ -6,8 +6,21 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 /* photos and videos uploaded in the dashboard are served from the project's public storage */
 const storage = process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname : undefined;
 
-/* on every response; the full Content-Security-Policy arrives with the security work in Phase 9 */
+/* What the browser may load, in production (the development server needs more). Scripts and styles are the site's
+   own (Next.js writes small inline ones); pictures and videos also come from the project's storage; the spam check
+   (Cloudflare Turnstile) is allowed only when it is set up. */
+const supabase = process.env.NEXT_PUBLIC_SUPABASE_URL ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).origin : '';
+const turnstile = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ? ' https://challenges.cloudflare.com' : '';
+const csp = [
+  "default-src 'self'", `script-src 'self' 'unsafe-inline'${turnstile}`, "style-src 'self' 'unsafe-inline'",
+  `img-src 'self' data: blob: ${supabase}`, `media-src 'self' blob: ${supabase}`, "font-src 'self'",
+  `connect-src 'self' ${supabase} ${supabase.replace(/^http/, 'ws')}${turnstile}`, `frame-src 'self'${turnstile}`,
+  "frame-ancestors 'none'", "base-uri 'self'", "form-action 'self'", "object-src 'none'",
+].join('; ');
+
+/* on every response */
 const securityHeaders = [
+  ...(process.env.NODE_ENV === 'production' ? [{ key: 'Content-Security-Policy', value: csp }] : []),
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'X-Frame-Options', value: 'DENY' },

@@ -36,7 +36,6 @@
   },
   "include": [
     "src",
-    "messages",
     "supabase/tests",
     "e2e",
     "vitest.config.ts",

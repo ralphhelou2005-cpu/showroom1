@@ -7,6 +7,8 @@ import { Link } from '@/i18n/link';
 import type { Locale } from '@/i18n/routing';
 import { listBrands } from '@/lib/catalog';
 import { pageMeta } from '@/lib/seo';
+import { WORDS } from '@/i18n/words';
+import { cardWords } from '@/i18n/server-words';
 
 export const revalidate = 300;
 export const dynamicParams = true;
@@ -23,9 +25,10 @@ const brand = async (locale: Locale, slug: string) => (await listBrands(locale))
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   const b = await brand(locale, slug);
-  if (!b) return { title: { absolute: 'Page not found | Milcar' }, robots: { index: false } };
-  const d = b.description || `Every ${b.name} in the Milcar showroom, with full specs and its history on request.`;
-  return pageMeta({ title: `${b.name} | Milcar`, description: d, image: b.vehicles[0]?.photos[0]?.src, path: '/brands/' + b.slug });
+  const m = WORDS[locale].meta;
+  if (!b) return { title: { absolute: m.notFound }, robots: { index: false } };
+  const d = b.description || m.brand(b.name);
+  return pageMeta({ title: `${b.name} | Milcar`, description: d, image: b.vehicles[0]?.photos[0]?.src, path: '/brands/' + b.slug, locale });
 }
 
 /* /brands/<slug>: one brand's cars on show */
@@ -34,17 +37,18 @@ export default async function BrandPage({ params }: Props) {
   setRequestLocale(locale);
   const b = await brand(locale, slug);
   if (!b) notFound();
+  const w = WORDS[locale], t = w.brands;
   return (
     <>
       <main id="main" tabIndex={-1}>
         <header className="inv-hero">
-          <Link className="crumb" href="/brands">All brands</Link>
-          <p className="label">The showroom</p>
+          <Link className="crumb" href="/brands">{t.all}</Link>
+          <p className="label">{t.label}</p>
           <h1>{b.name}</h1>
-          <p>{b.description || `Every ${b.name} on our floor. Pick a car to see its full specs, then ask for its history.`}</p>
+          <p>{b.description || t.every(b.name)}</p>
         </header>
         <div className="grid">
-          {b.vehicles.map((v, i) => <CarCard key={v.id} car={v} i={i} lead={i === 0 && b.vehicles.length > 2} />)}
+          {b.vehicles.map((v, i) => <CarCard key={v.id} car={v} i={i} lead={i === 0 && b.vehicles.length > 2} t={cardWords(w, locale)} />)}
         </div>
       </main>
       <Footer />

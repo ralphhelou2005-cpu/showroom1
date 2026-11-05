@@ -1,32 +1,66 @@
 'use client';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useActionState, useEffect, useRef } from 'react';
+import { requestViewing } from '@/app/[locale]/booking-action';
+import type { Words } from '@/i18n/words';
 
-/* "Book a private viewing." Sending arrives with the booking system (Phase 7): until then the form says plainly that
-   nothing was sent. A car page links here with ?car=<name>, which fills in the car once the page is in the browser
-   (as before: the built page has the field empty). `image` is the showroom picture beside the form. */
-export default function BookingForm({ image }: { image: { src: string; set: string } }) {
-  const [sent, setSent] = useState(false);
-  const car = useRef<HTMLInputElement>(null);
+export type Slot = { value: string; day: string; time: string };
+
+/* "Book a private viewing." The request goes to the server (src/app/[locale]/booking-action.ts). A car page links
+   here with ?car=<name>&slug=<address>, which fills in the car once the page is in the browser (the built page has
+   the field empty). The time field shows only when the showroom has free times; without opening hours the team
+   calls back to arrange one. `image` is the showroom picture beside the form. */
+export default function BookingForm({ image, t, slots, whatsapp, locale, turnstile }: {
+  image: { src: string; set: string }; t: Words['booking']; slots: Slot[]; whatsapp: string | null; locale: string; turnstile: string | null;
+}) {
+  const [state, action, pending] = useActionState(requestViewing, null);
+  const car = useRef<HTMLInputElement>(null), slug = useRef<HTMLInputElement>(null), label = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    const wanted = new URLSearchParams(location.search).get('car');
-    if (wanted && car.current) car.current.value = wanted;
+    const q = new URLSearchParams(location.search);
+    if (q.get('car') && car.current) car.current.value = q.get('car')!;
+    if (q.get('slug') && slug.current) slug.current.value = q.get('slug')!;
   }, []);
+  useEffect(() => {
+    if (!turnstile || document.getElementById('turnstile-js')) return;
+    const s = document.createElement('script');
+    s.id = 'turnstile-js'; s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js'; s.async = true; s.defer = true;
+    document.head.appendChild(s);
+  }, [turnstile]);
+  const sent = !!state?.ok;
   /* the page got shorter: the tail-light streak follows */
   useEffect(() => { if (sent) dispatchEvent(new Event('milcar:layout')); }, [sent]);
-  const send = (e: FormEvent) => { e.preventDefault(); setSent(true); };
+  const days = [...new Set(slots.map(s => s.day))];
+  const v = state?.values;
   return (
     <section className="book" id="book">
-      <div className="book-img"><img src={image.src} srcSet={image.set} sizes="(max-width:900px) 100vw, 55vw" width={1728} height={972} alt="The Milcar showroom glowing at night" loading="lazy" decoding="async" /></div>
+      <div className="book-img"><img src={image.src} srcSet={image.set} sizes="(max-width:900px) 100vw, 55vw" width={1728} height={972} alt={t.imgAlt} loading="lazy" decoding="async" /></div>
       <div className={'book-form' + (sent ? ' sent' : '')} id="bookForm">
-        <h2>Book a private viewing.</h2>
-        <p>Tell us how to reach you and which car you want to see.</p>
-        <form id="form" onSubmit={send}>
-          <label><span className="label">Name</span><input name="name" required autoComplete="name" placeholder="Your name" /></label>
-          <label><span className="label">Phone</span><input name="phone" type="tel" required autoComplete="tel" placeholder="Your phone number" /></label>
-          <label><span className="label">Car of interest</span><input name="car" ref={car} placeholder="The car you have in mind" /></label>
-          <button className="btn" type="submit" id="bookEnd">Request my viewing</button>
+        <h2>{t.title}</h2>
+        <p>{t.text}</p>
+        <form id="form" action={action}>
+          <label><span className="label">{t.name}</span><input name="name" defaultValue={v?.name} required autoComplete="name" placeholder={t.namePh} maxLength={120} /></label>
+          <label><span className="label">{t.phone}</span><input name="phone" type="tel" defaultValue={v?.phone} required autoComplete="tel" placeholder={t.phonePh} /></label>
+          <label><span className="label">{t.car}</span><input name="car" ref={car} defaultValue={v?.car} placeholder={t.carPh} maxLength={200} /></label>
+          {slots.length > 0 && (
+            <label><span className="label">{t.time}</span>
+              <select name="starts_at" className="book-time" defaultValue={v?.starts_at ?? ''} key={v?.starts_at ?? ''} onChange={e => { if (label.current) label.current.value = e.target.selectedOptions[0]?.dataset.label ?? ''; }}>
+                <option value="">{t.timeAny}</option>
+                {days.map(d => <optgroup key={d} label={d}>{slots.filter(s => s.day === d).map(s => <option key={s.value} value={s.value} data-label={`${d}, ${s.time}`}>{s.time}</option>)}</optgroup>)}
+              </select>
+            </label>
+          )}
+          <input type="hidden" name="slug" ref={slug} defaultValue={v?.slug} />
+          <input type="hidden" name="at_label" ref={label} defaultValue={v?.at_label} />
+          <input type="hidden" name="locale" value={locale} />
+          <input name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, opacity: 0 }} />
+          {turnstile && <div className="cf-turnstile" data-sitekey={turnstile} data-theme="dark" />}
+          {state?.error && <p role="alert" className="book-error">{t.errors[state.error]}{whatsapp && (state.error === 'offline' || state.error === 'failed' || state.error === 'busy') ? <> <a href={whatsapp} rel="noopener" target="_blank">{t.whatsapp}</a></> : null}</p>}
+          <button className="btn" type="submit" id="bookEnd" disabled={pending}>{pending ? t.sending : t.send}</button>
         </form>
-        <div className="done-msg" role="status"><h3>Thanks, this is a preview.</h3><p>This form isn't connected yet, so your details weren't sent anywhere.</p></div>
+        <div className="done-msg" role="status">
+          <h3>{t.doneTitle}</h3>
+          <p>{state?.at ? t.doneTime.replace('{time}', state.at) : t.doneCall}</p>
+          {whatsapp && <p><a href={whatsapp} rel="noopener" target="_blank">{t.whatsapp}</a></p>}
+        </div>
       </div>
     </section>
   );

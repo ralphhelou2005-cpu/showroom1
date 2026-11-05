@@ -5,11 +5,15 @@ import Footer from '@/components/Footer';
 import type { Locale } from '@/i18n/routing';
 import { listVehicles, type Vehicle } from '@/lib/catalog';
 import { pageMeta } from '@/lib/seo';
+import { WORDS } from '@/i18n/words';
 
 export const revalidate = 300;
 
-const d = 'The cars in the Milcar showroom windows tonight. Pick a window to see the car.';
-export const metadata: Metadata = pageMeta({ title: 'Featured | Milcar', description: d, image: 'assets/dealership-1200.webp', path: '/featured' });
+export async function generateMetadata({ params }: { params: Promise<{ locale: Locale }> }): Promise<Metadata> {
+  const { locale } = await params;
+  const m = WORDS[locale].meta.featured;
+  return pageMeta({ title: m.title, description: m.description, image: 'assets/dealership-1200.webp', path: '/featured', locale });
+}
 
 /* /featured: the dealership windows as their own page */
 export default async function FeaturedPage({ params }: { params: Promise<{ locale: Locale }> }) {

@@ -1,0 +1,53 @@
+# A nightly copy of the database, encrypted before it leaves the runner (the repository is public: only someone with
+# BACKUP_PASSPHRASE can open it). Kept 30 days as a workflow artifact. Runs from the default branch once these two
+# repository secrets exist (Settings > Secrets and variables > Actions):
+#   SUPABASE_DB_URL     Supabase > Connect > Session pooler connection string, with the database password
+#   BACKUP_PASSPHRASE   a long random passphrase, kept somewhere safe outside GitHub
+# Without them the job says so and stops. To restore: gpg -d milcar-*.sql.gpg > dump.sql, then psql "$URL" < dump.sql
+name: Database backup
+
+on:
+  schedule:
+    - cron: '30 1 * * *'   # 01:30 UTC, after midnight in Beirut
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check the secrets
+        id: check
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          if [ -z "$DB" ] || [ -z "$PASS" ]; then echo "SUPABASE_DB_URL or BACKUP_PASSPHRASE isn't set: no backup made."; echo "ready=no" >> "$GITHUB_OUTPUT"; else echo "ready=yes" >> "$GITHUB_OUTPUT"; fi
+      - name: Install the Postgres 17 client
+        if: steps.check.outputs.ready == 'yes'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y -qq postgresql-client-17
+      - name: Dump and encrypt
+        if: steps.check.outputs.ready == 'yes'
+        env:
+          DB: ${{ secrets.SUPABASE_DB_URL }}
+          PASS: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          set -euo pipefail
+          f="milcar-$(date -u +%Y-%m-%d).sql"
+          /usr/lib/postgresql/17/bin/pg_dump "$DB" --no-owner --no-privileges --schema=public --schema=private --schema=storage > "$f"
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$PASS" --symmetric --cipher-algo AES256 -o "$f.gpg" "$f"
+          shred -u "$f"
+          ls -l "$f.gpg"
+      - name: Keep it 30 days
+        if: steps.check.outputs.ready == 'yes'
+        uses: actions/upload-artifact@v4
+        with:
+          name: milcar-database
+          path: milcar-*.sql.gpg
+          retention-days: 30

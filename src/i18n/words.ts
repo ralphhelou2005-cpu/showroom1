@@ -57,7 +57,7 @@ const en = {
   booking: {
     imgAlt: 'The Milcar showroom glowing at night', title: 'Book a private viewing.', text: 'Tell us how to reach you and which car you want to see.',
     name: 'Name', namePh: 'Your name', phone: 'Phone', phonePh: 'Your phone number', car: 'Car of interest', carPh: 'The car you have in mind',
-    time: 'Preferred time', timeAny: 'Any time: call me to arrange it', send: 'Request my viewing', sending: 'Sending…',
+    time: 'Preferred time', timeAny: 'Any time: call me to arrange it', pickDay: 'Choose a day', pickTime: 'Choose a time', send: 'Request my viewing', sending: 'Sending…',
     doneTitle: 'Thank you.', doneCall: 'We’ll call you shortly to arrange your viewing.', doneTime: 'We’ve noted {time}. We’ll call you to confirm it.',
     whatsapp: 'Prefer WhatsApp? Message us.',
     errors: {
@@ -147,7 +147,7 @@ const fr: Words = {
   booking: {
     imgAlt: 'Le showroom Milcar illuminé la nuit', title: 'Réservez une visite privée.', text: 'Dites-nous comment vous joindre et quelle voiture vous souhaitez voir.',
     name: 'Nom', namePh: 'Votre nom', phone: 'Téléphone', phonePh: 'Votre numéro de téléphone', car: 'Voiture souhaitée', carPh: 'La voiture qui vous intéresse',
-    time: 'Moment souhaité', timeAny: 'N’importe quand : appelez-moi pour convenir', send: 'Demander ma visite', sending: 'Envoi…',
+    time: 'Moment souhaité', timeAny: 'N’importe quand : appelez-moi pour convenir', pickDay: 'Choisissez un jour', pickTime: 'Choisissez une heure', send: 'Demander ma visite', sending: 'Envoi…',
     doneTitle: 'Merci.', doneCall: 'Nous vous appelons très bientôt pour organiser votre visite.', doneTime: 'Nous avons noté {time}. Nous vous appelons pour le confirmer.',
     whatsapp: 'Vous préférez WhatsApp ? Écrivez-nous.',
     errors: {
@@ -235,7 +235,7 @@ const ar: Words = {
   booking: {
     imgAlt: 'معرض ميلكار متوهّجاً ليلاً', title: 'احجز معاينة خاصة.', text: 'أخبرنا كيف نتواصل معك وأيّ سيارة تريد أن ترى.',
     name: 'الاسم', namePh: 'اسمك', phone: 'الهاتف', phonePh: 'رقم هاتفك', car: 'السيارة المطلوبة', carPh: 'السيارة التي تفكّر بها',
-    time: 'الموعد المفضّل', timeAny: 'أيّ وقت: اتصلوا بي لتحديده', send: 'اطلب معاينتي', sending: 'جارٍ الإرسال…',
+    time: 'الموعد المفضّل', timeAny: 'أيّ وقت: اتصلوا بي لتحديده', pickDay: 'اختر يوماً', pickTime: 'اختر الساعة', send: 'اطلب معاينتي', sending: 'جارٍ الإرسال…',
     doneTitle: 'شكراً لك.', doneCall: 'سنتصل بك قريباً لترتيب معاينتك.', doneTime: 'سجّلنا موعد {time}. سنتصل بك لتأكيده.',
     whatsapp: 'تفضّل واتساب؟ راسلنا.',
     errors: {

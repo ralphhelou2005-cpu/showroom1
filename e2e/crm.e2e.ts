@@ -15,7 +15,7 @@ try {
   await v.page.click('a.btn:has-text("Book a private viewing")');
   await v.page.waitForURL(u => u.pathname === '/' && u.hash === '#book');
   await v.page.waitForFunction(() => (document.querySelector('#book input[name=car]') as HTMLInputElement)?.value.length > 0);
-  check(await v.page.locator('#book select[name=starts_at]').count() === 0, 'without opening hours the form has no time field, as before');
+  check(await v.page.locator('#book .book-when').count() === 0, 'without opening hours the form has no calendar, as before');
   await v.page.fill('#book input[name=name]', 'Rami Khoury');
   await v.page.fill('#book input[name=phone]', '03 123 456');
   await v.page.click('#bookEnd');
@@ -58,12 +58,15 @@ try {
   const v2 = await open();
   await v2.page.goto(APP + '/contact');
   check((await text(v2.page)).includes('Dbayeh Highway, Lebanon') && (await text(v2.page)).includes('Mon–Sat 10:00–19:00'), 'the contact page shows the address and the hours');
-  const options = v2.page.locator('#book select[name=starts_at] option');
-  check(await options.count() > 5, 'the form offers free times within the opening hours');
+  const openDays = v2.page.locator('#book .book-day:not([disabled])');
+  check(await openDays.count() >= 10 && await v2.page.locator('#book .book-day[disabled]').count() > 0, 'the calendar offers the open days of the next weeks, Sundays closed');
+  check(await v2.page.locator('#book .book-slot').count() > 3 && (await text(v2.page, '#book .book-when-note')).includes('Any time'), 'the first free day shows its times; no time chosen yet means a call back');
   await v2.page.fill('#book input[name=name]', 'Nadia Saab');
   await v2.page.fill('#book input[name=phone]', '+961 70 111 222');
   await v2.page.fill('#book input[name=car]', 'Mercedes-AMG G 63');
-  await v2.page.locator('#book select[name=starts_at]').selectOption({ index: 3 });
+  await openDays.nth(1).click();
+  await v2.page.locator('#book .book-slot').nth(2).click();
+  check(!!(await v2.page.locator('#book input[name=starts_at]').inputValue()) && /, \d\d:\d\d$/.test(await text(v2.page, '#book .book-when-note')), 'choosing a day and a time shows it', await text(v2.page, '#book .book-when-note'));
   await v2.page.click('#bookEnd');
   await v2.page.locator('#bookForm.sent').waitFor();
   check((await text(v2.page, '#book .done-msg')).includes('We’ve noted'), 'with a time, the visitor is told it is noted, to be confirmed');

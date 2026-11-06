@@ -2,18 +2,17 @@
 import { useActionState, useEffect, useRef } from 'react';
 import { requestViewing } from '@/app/[locale]/booking-action';
 import type { Words } from '@/i18n/words';
-
-export type Slot = { value: string; day: string; time: string };
+import SlotPicker, { type Slot } from './SlotPicker';
 
 /* "Book a private viewing." The request goes to the server (src/app/[locale]/booking-action.ts). A car page links
    here with ?car=<name>&slug=<address>, which fills in the car once the page is in the browser (the built page has
-   the field empty). The time field shows only when the showroom has free times; without opening hours the team
-   calls back to arrange one. `image` is the showroom picture beside the form. */
-export default function BookingForm({ image, t, slots, whatsapp, locale, turnstile }: {
-  image: { src: string; set: string }; t: Words['booking']; slots: Slot[]; whatsapp: string | null; locale: string; turnstile: string | null;
+   the field empty). The calendar (./SlotPicker) shows only when the showroom has free times; without opening hours
+   the team calls back to arrange one. `image` is the showroom picture beside the form. */
+export default function BookingForm({ image, t, slots, today, whatsapp, locale, turnstile }: {
+  image: { src: string; set: string }; t: Words['booking']; slots: Slot[]; today: string; whatsapp: string | null; locale: 'en' | 'fr' | 'ar'; turnstile: string | null;
 }) {
   const [state, action, pending] = useActionState(requestViewing, null);
-  const car = useRef<HTMLInputElement>(null), slug = useRef<HTMLInputElement>(null), label = useRef<HTMLInputElement>(null);
+  const car = useRef<HTMLInputElement>(null), slug = useRef<HTMLInputElement>(null);
   useEffect(() => {
     const q = new URLSearchParams(location.search);
     if (q.get('car') && car.current) car.current.value = q.get('car')!;
@@ -28,7 +27,6 @@ export default function BookingForm({ image, t, slots, whatsapp, locale, turnsti
   const sent = !!state?.ok;
   /* the page got shorter: the tail-light streak follows */
   useEffect(() => { if (sent) dispatchEvent(new Event('milcar:layout')); }, [sent]);
-  const days = [...new Set(slots.map(s => s.day))];
   const v = state?.values;
   return (
     <section className="book" id="book">
@@ -40,16 +38,8 @@ export default function BookingForm({ image, t, slots, whatsapp, locale, turnsti
           <label><span className="label">{t.name}</span><input name="name" defaultValue={v?.name} required autoComplete="name" placeholder={t.namePh} maxLength={120} /></label>
           <label><span className="label">{t.phone}</span><input name="phone" type="tel" defaultValue={v?.phone} required autoComplete="tel" placeholder={t.phonePh} /></label>
           <label><span className="label">{t.car}</span><input name="car" ref={car} defaultValue={v?.car} placeholder={t.carPh} maxLength={200} /></label>
-          {slots.length > 0 && (
-            <label><span className="label">{t.time}</span>
-              <select name="starts_at" className="book-time" defaultValue={v?.starts_at ?? ''} key={v?.starts_at ?? ''} onChange={e => { if (label.current) label.current.value = e.target.selectedOptions[0]?.dataset.label ?? ''; }}>
-                <option value="">{t.timeAny}</option>
-                {days.map(d => <optgroup key={d} label={d}>{slots.filter(s => s.day === d).map(s => <option key={s.value} value={s.value} data-label={`${d}, ${s.time}`}>{s.time}</option>)}</optgroup>)}
-              </select>
-            </label>
-          )}
+          <SlotPicker slots={slots} today={today} locale={locale} t={t} initial={v?.starts_at} />
           <input type="hidden" name="slug" ref={slug} defaultValue={v?.slug} />
-          <input type="hidden" name="at_label" ref={label} defaultValue={v?.at_label} />
           <input type="hidden" name="locale" value={locale} />
           <input name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, opacity: 0 }} />
           {turnstile && <div className="cf-turnstile" data-sitekey={turnstile} data-theme="dark" />}

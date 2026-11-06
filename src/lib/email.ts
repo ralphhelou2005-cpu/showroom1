@@ -40,14 +40,15 @@ export async function sendEmail(m: Mail) {
   return status;
 }
 
-/* who hears about new inquiries: the addresses in Settings, else every active owner and manager */
+/* who hears about new inquiries: the addresses in Settings, else every active owner, manager and salesperson */
 export async function staffRecipients(): Promise<string[]> {
   if (!secretKey()) return [];
   const admin = supabaseAdmin();
   const { data: s } = await admin.from('site_settings').select('value').eq('key', 'notifications.email').maybeSingle();
   const listed = ((s?.value as { staff_recipients?: string[] } | null)?.staff_recipients ?? []).filter(Boolean);
   if (listed.length) return listed;
-  const { data } = await admin.from('profiles').select('email').in('role', ['OWNER', 'MANAGER']).eq('active', true);
+  /* everyone who looks after customers; inventory editors don't see customers' details */
+  const { data } = await admin.from('profiles').select('email').in('role', ['OWNER', 'MANAGER', 'SALESPERSON']).eq('active', true);
   return (data ?? []).map(p => p.email).filter((e): e is string => !!e);
 }
 

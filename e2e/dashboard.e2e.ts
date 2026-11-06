@@ -9,6 +9,7 @@ import { chromium, type Browser, type BrowserContext, type Page } from 'playwrig
 import { mkdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { outbox, startFake } from './fake-supabase.ts';
+import { waitsForPages } from './helpers.ts';
 
 const APP = process.env.APP ?? 'http://localhost:3300';
 const CHROME = process.env.CHROME ?? 'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe';
@@ -30,6 +31,7 @@ async function open(view: 'computer' | 'phone' = 'computer'): Promise<{ ctx: Bro
   const page = await ctx.newPage();
   page.on('console', m => { if (m.type() === 'error' && !/favicon|Failed to load resource: the server responded with a status of 40[134]/.test(m.text())) errors.push(m.text()); });
   page.on('pageerror', e => errors.push(String(e)));
+  waitsForPages(page);
   return { ctx, page };
 }
 async function signIn(page: Page, who: { email: string; password: string }) {
@@ -82,6 +84,7 @@ try {
     /* ---------------------------------------------------------- inviting */
     await page.click('a[href="/admin/team"]');
     await page.waitForURL(APP + '/admin/team');
+    await page.getByText('Minas Missirian (you)').waitFor();   // the development server may show the last page a moment longer
     let team = await text(page);
     check(team.includes('Minas Missirian (you)') && team.includes('No role: no access'), 'the team list shows everyone, including a login without a role');
     check(await page.locator('li', { hasText: 'Minas Missirian (you)' }).locator('button').count() === 0, 'the owner has no controls on their own line');

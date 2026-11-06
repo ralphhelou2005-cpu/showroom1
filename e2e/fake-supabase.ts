@@ -8,7 +8,7 @@
      functions (no nested selects).
    - GET /__outbox lists the emails Auth would have sent (password resets), so a test can follow the link.
    Start: node e2e/fake-supabase.ts [port]   (default 54321) */
-import { createHash, createHmac, randomBytes, randomUUID } from 'node:crypto';
+import { createHash, generateKeyPairSync, randomBytes, randomUUID, sign as signBytes, verify as verifyBytes } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -16,7 +16,12 @@ import type { PGlite, Transaction } from '@electric-sql/pglite';
 import { createDb, U } from '../supabase/tests/db.ts';
 
 export const KEYS = { publishable: 'sb_publishable_e2e_local_only', secret: 'sb_secret_e2e_local_only' };
-const JWT_SECRET = 'e2e-local-only-jwt-secret-not-used-anywhere-else';
+/* logins are signed like the live project's: ES256, with the public key at /auth/v1/.well-known/jwks.json, so the
+   platform checks them on the spot (getClaims) as it does live. A new key pair for each run, under a new key id: the
+   platform keeps the keys it has fetched, and an unknown id makes it fetch them again. */
+const JWT = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+const KID = 'e2e-local-only-' + randomUUID();
+const JWKS = { keys: [{ ...JWT.publicKey.export({ format: 'jwk' }), kid: KID, alg: 'ES256', use: 'sig', key_ops: ['verify'] }] };
 const STAFF: Record<string, { email: string; password: string }> = JSON.parse(readFileSync(join(import.meta.dirname, 'fixtures/staff.json'), 'utf8'));
 
 const b64 = (s: string | Buffer) => Buffer.from(s).toString('base64url');
@@ -24,13 +29,13 @@ const sha = (s: string) => createHash('sha256').update(s).digest('hex');
 const hashPassword = (pw: string) => 'e2e$' + sha('e2e-salt:' + pw);
 
 function sign(claims: Record<string, unknown>) {
-  const head = b64(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+  const head = b64(JSON.stringify({ alg: 'ES256', typ: 'JWT', kid: KID }));
   const body = b64(JSON.stringify(claims));
-  return `${head}.${body}.${createHmac('sha256', JWT_SECRET).update(`${head}.${body}`).digest('base64url')}`;
+  return `${head}.${body}.${b64(signBytes('sha256', Buffer.from(`${head}.${body}`), { key: JWT.privateKey, dsaEncoding: 'ieee-p1363' }))}`;
 }
 function verify(token: string): Record<string, any> | null {
   const [head, body, sig] = token.split('.');
-  if (!sig || createHmac('sha256', JWT_SECRET).update(`${head}.${body}`).digest('base64url') !== sig) return null;
+  if (!sig || !verifyBytes('sha256', Buffer.from(`${head}.${body}`), { key: JWT.publicKey, dsaEncoding: 'ieee-p1363' }, Buffer.from(sig, 'base64url'))) return null;
   const claims = JSON.parse(Buffer.from(body, 'base64url').toString());
   return claims.exp * 1000 > Date.now() ? claims : null;
 }
@@ -115,6 +120,7 @@ async function auth(req: IncomingMessage, path: string, url: URL, body: any, bea
     if (banned(u)) fail(400, 'user_banned', 'User is banned');
     return startSession(u);
   }
+  if (path === '/.well-known/jwks.json') return JWKS;
   if (path === '/user' && req.method === 'GET') {
     const u = await me();
     if (banned(u)) fail(403, 'user_banned', 'User is banned');

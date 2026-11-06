@@ -19,13 +19,17 @@ export type Profile = {
   preferred_locale: Database['public']['Enums']['locale'];
 };
 
-/* the signed-in person and their profile, checked with Supabase Auth (once per request) */
+/* the signed-in person and their profile (once per request). The login is checked against the project's public
+   signing key (ES256) on the spot, without a trip to Supabase Auth; the role and "switched on" come from the
+   profile on every request, so switching someone off still takes effect at once. */
 export const currentStaff = cache(async (): Promise<{ id: string; email: string; profile: Profile | null } | null> => {
   const supabase = await supabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data } = await supabase.from('profiles').select('id, email, full_name, phone, role, active, preferred_locale').eq('id', user.id).maybeSingle();
-  return { id: user.id, email: user.email ?? '', profile: data };
+  const { data: auth } = await supabase.auth.getClaims();
+  const id = auth?.claims?.sub;
+  if (!id) return null;
+  const { data } = await supabase.from('profiles').select('id, email, full_name, phone, role, active, preferred_locale').eq('id', id).maybeSingle();
+  if (data && !data.active) return null;   // switched off: signed out at once (signing in again is blocked too)
+  return { id, email: typeof auth.claims.email === 'string' ? auth.claims.email : '', profile: data };
 });
 
 /* for pages and actions: the person, with a role and switched on, or off to the login page */

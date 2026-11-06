@@ -17,7 +17,8 @@ const event = z.object({
   referrer: z.string().max(253).optional(),
   utm_source: z.string().max(100).optional(), utm_medium: z.string().max(100).optional(), utm_campaign: z.string().max(100).optional(),
 });
-const BOTS = /bot|crawl|spider|slurp|preview|facebookexternalhit|lighthouse|pingdom|monitor/i;
+/* robots, link previews, and automated browsers (HeadlessChrome, the host's own checks after each deployment) */
+const BOTS = /bot|crawl|spider|slurp|preview|facebookexternalhit|lighthouse|pingdom|monitor|headless|vercel|playwright|puppeteer|selenium/i;
 
 export async function POST(request: NextRequest) {
   if (!secretKey() || (process.env.ANALYTICS_SALT?.length ?? 0) < 32) return new NextResponse(null, { status: 204 });

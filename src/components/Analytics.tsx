@@ -5,6 +5,9 @@ import { usePathname } from 'next/navigation';
 /* Tells the website's own analytics (src/app/api/events) about each page seen, each car seen, and each tap on a
    WhatsApp or phone link. No cookies, nothing stored in the browser, and nothing at all when the visitor's browser
    asks not to be tracked. Sent once the page is idle, so it never slows the page. */
+/* where the visitor came from goes with the first page only: the browser keeps it for the whole visit */
+let landed = false;
+
 export default function Analytics() {
   const path = usePathname();
   useEffect(() => {
@@ -20,7 +23,8 @@ export default function Analytics() {
     };
     const idle = (f: () => void) => ('requestIdleCallback' in window ? requestIdleCallback(f, { timeout: 4000 }) : setTimeout(f, 1500));
     idle(() => {
-      send({ type: 'page_view', referrer, ...Object.fromEntries(['utm_source', 'utm_medium', 'utm_campaign'].filter(k => q.get(k)).map(k => [k, q.get(k)!.slice(0, 100)])) });
+      send({ type: 'page_view', referrer: landed ? undefined : referrer, ...Object.fromEntries(['utm_source', 'utm_medium', 'utm_campaign'].filter(k => q.get(k)).map(k => [k, q.get(k)!.slice(0, 100)])) });
+      landed = true;
       const car = bare.match(/^\/car\/([a-z0-9-]+)$/);
       if (car) send({ type: 'vehicle_view', slug: car[1] });
     });

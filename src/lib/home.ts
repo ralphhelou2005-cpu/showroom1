@@ -112,8 +112,11 @@ export function startHome(root: HTMLElement): () => void {
       const ms = new MediaSource(); let sb: SourceBuffer | null = null, queue: Uint8Array[] = [], ended = false, failed = false, total = 0, got = 0;
       const fail = () => { if (failed) return; failed = true; no(); };
       const grow = () => {
-        if (!sb || !sb.buffered.length) return;
-        const n = FILMS.fast[2], f = ended && !queue.length ? n - 1 : Math.min(n - 1, Math.floor(sb.buffered.end(sb.buffered.length - 1) * FILMS.fast[1] + 1e-6) - 1);
+        if (!sb || !alive) return;   // left the page: the film's buffer may already be closed
+        let have: TimeRanges;
+        try { have = sb.buffered; } catch { return; }
+        if (!have.length) return;
+        const n = FILMS.fast[2], f = ended && !queue.length ? n - 1 : Math.min(n - 1, Math.floor(have.end(have.length - 1) * FILMS.fast[1] + 1e-6) - 1);
         setReach(f, n);
       };
       const feed = () => {

@@ -38,7 +38,29 @@ export async function open(view: 'computer' | 'phone' = 'computer'): Promise<{ c
     errors.push(t);
   });
   page.on('pageerror', e => errors.push(String(e)));
+  waitsForPages(page);
   return { ctx, page };
+}
+
+/* A dashboard page switches at once to its placeholder (loading.tsx, marked data-loading), address already changed,
+   and its content follows: it has arrived once the placeholder is gone and its title (every page has an h1) is in.
+   That includes a page that sends its visitor elsewhere as it streams in. goto, waitForURL and reload wait for that. */
+export function waitsForPages(page: Page) {
+  const settle = async () => {
+    if (!new URL(page.url()).pathname.startsWith('/admin')) return;
+    /* the development server fetches nothing ahead, so the address can change while the last page still shows, and a
+       page that forwards its visitor replaces the document under any wait: look again until the page is in */
+    for (const until = Date.now() + 30000; Date.now() < until; await page.waitForTimeout(100)) {
+      try {
+        await page.waitForLoadState('networkidle', { timeout: 5000 }).catch(() => {});
+        if (await page.evaluate(() => !document.querySelector('[data-loading]') && !!document.querySelector('main h1'))) return;
+      } catch { /* the page moved on */ }
+    }
+  };
+  const goto = page.goto.bind(page), waitForURL = page.waitForURL.bind(page), reload = page.reload.bind(page);
+  page.goto = async (...a: Parameters<Page['goto']>) => { const r = await goto(...a); await settle(); return r; };
+  page.waitForURL = async (...a: Parameters<Page['waitForURL']>) => { await waitForURL(...a); await settle(); };
+  page.reload = async (...a: Parameters<Page['reload']>) => { const r = await reload(...a); await settle(); return r; };
 }
 export async function signIn(page: Page, who: { email: string; password: string }, then = '/admin') {
   await page.goto(APP + '/admin/login?next=' + encodeURIComponent(then));

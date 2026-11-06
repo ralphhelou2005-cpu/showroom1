@@ -1,5 +1,5 @@
 'use client';
-import Link from 'next/link';
+import Link, { useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { Role } from '@/lib/roles';
 
@@ -17,6 +17,12 @@ const PAGES: [href: string, label: string, roles?: Role[]][] = [
   ['/admin/account', 'Your account'],
 ];
 
+/* a dot that pulses beside the link just clicked, from the click until its page is ready */
+function Pending() {
+  const { pending } = useLinkStatus();
+  return <span aria-hidden="true" className={'ms-2 inline-block size-1.5 rounded-full bg-champagne align-middle transition-opacity ' + (pending ? 'animate-pulse opacity-100' : 'opacity-0')} />;
+}
+
 export default function AdminNav({ role }: { role: Role }) {
   const path = usePathname();
   return (
@@ -29,7 +35,7 @@ export default function AdminNav({ role }: { role: Role }) {
               <Link href={href} aria-current={here ? 'page' : undefined}
                 className={'block whitespace-nowrap rounded-full px-4 py-2 text-[14px] tracking-[.06em] no-underline transition-colors md:rounded-xl ' +
                   (here ? 'bg-panel-2 text-champagne-hi shadow-[inset_0_0_0_1px_var(--line)]' : 'text-muted hover:text-ink')}>
-                {label}
+                {label}<Pending />
               </Link>
             </li>
           );

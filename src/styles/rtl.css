@@ -24,5 +24,4 @@
 [dir=rtl] .tag{left:auto;right:14px}
 [dir=rtl] .tag.reserved{right:auto;left:14px}
 [dir=rtl] .spec-block dd{text-align:left}
-[dir=rtl] .book-time{padding:0 0 0 24px;background-position:left 4px center}
 [dir=rtl] .btn::after{transform-origin:100% 50%}

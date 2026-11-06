@@ -86,7 +86,7 @@ export function RecipientsForm({ list }: { list: string[] }) {
   const [state, action] = useActionState(saveRecipients, null);
   return (
     <form action={action} className="[display:grid] gap-4" noValidate>
-      <Field label="Who hears about new inquiries" hint="Emails separated by commas. Empty: the owner and the managers."><input name="recipients" defaultValue={state?.values?.recipients ?? list.join(', ')} /></Field>
+      <Field label="Who hears about new inquiries" hint="Emails separated by commas. Empty: everyone on the team who looks after customers (owner, managers, salespeople)."><input name="recipients" defaultValue={state?.values?.recipients ?? list.join(', ')} /></Field>
       <Message state={state} /><Submit className={save} busy="Saving…">Save</Submit>
     </form>
   );

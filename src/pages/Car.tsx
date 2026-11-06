@@ -54,7 +54,7 @@ function Details({ car, next }: { car: Car; next: Car | null }) {
           {car.tagline && <p className="car-line">{car.tagline}</p>}
           <p className="price"><Named text={PRICE(car)} /></p>
           {car.status === 'reserved' && <p className="car-line">This car is reserved. Ask us to hear if it becomes available.</p>}
-          <Link className="btn" to={'/?car=' + encodeURIComponent(NAME(car)) + '#book'}>Book a private viewing</Link>
+          <Link className="btn" to={'/?car=' + encodeURIComponent(NAME(car)) + '&slug=' + encodeURIComponent(car.id) + '#book'}>Book a private viewing</Link>
         </div>
       </div>
       <div className="spec-grid">

@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigationType } from 'react-router';
+import Analytics from './components/Analytics';
 import Nav from './components/Nav';
 import Home from './pages/Home';
 
@@ -70,6 +71,7 @@ export default function App() {
   return (
     <>
       <ScrollManager />
+      <Analytics />
       <a className="skip" href="#main">Skip to content</a>
       {pathname !== '/' && <><div className="env" aria-hidden="true" /><div className="grain" aria-hidden="true" /></>}
       <Nav />

@@ -21,7 +21,11 @@ export async function launch() {
   return browser;
 }
 export async function open(view: 'computer' | 'phone' = 'computer'): Promise<{ ctx: BrowserContext; page: Page }> {
-  const ctx = await browser.newContext(view === 'phone' ? { viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true } : { viewport: { width: 1440, height: 900 } });
+  /* an ordinary Chrome's name, as visitors' browsers give it: the analytics leave out automated browsers ("HeadlessChrome") */
+  const userAgent = view === 'phone'
+    ? 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Mobile Safari/537.36'
+    : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36';
+  const ctx = await browser.newContext(view === 'phone' ? { viewport: { width: 375, height: 812 }, isMobile: true, hasTouch: true, userAgent } : { viewport: { width: 1440, height: 900 }, userAgent });
   const page = await ctx.newPage();
   page.on('console', m => {
     const t = m.text();
